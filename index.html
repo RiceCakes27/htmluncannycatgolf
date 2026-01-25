@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+    <body>
+        <div id="Manager">
+            <audio id="bgmusic" loop autoplay src="assets/music/TitleTheme.ogg"></audio>
+            <div id="HUD">
+                <nav id="LevelLabels">
+                    <h1 id="StageNameLabel">0-1: Welcome to Uncanny Cat Golf!</h1>
+                    <h1 id="GolfHitLabel">Golf Hit: 0</h1>
+                    <h1 id="LevelTimeLabel">Time: 00:00</h1>
+                </nav>
+                <h1 id="ScoreLabel">Score: 0</h1>
+                <h3 id="TimeLabel">Total Time: 00:00</h3>
+                <h3 id="ResetLabel">Resets: 0</h3>
+                <h3 id="SkipsLabel">Skips: 0</h3>
+                <img id="GameTitle" src="assets/graphics/gametitle.png">
+                <div id="ThoughtBubble">
+                    <div id="Thoughts">
+                        <img src="assets/graphics/TVThoughts/TVStatic.png">
+                    </div>
+                </div>
+                <img id="Thinker" src="assets/graphics/canny.png">
+            </div>
+            <div id="Menus">
+                <div id="MainMenu">
+                    <img id="GameTitle" src="assets/graphics/gametitle.png">
+                    <div id="Cats">
+                        <img id="Cat1" src="assets/graphics/canny.png">
+                        <img id="Cat2" src="assets/graphics/canny.png">
+                    </div>
+                    <div class="ButtonHolder">
+                        <div id="StartButton" class="Button">
+                            <h2>START NEW GAME</h2>
+                        </div>
+                        <div class="Button">
+                            <h2>START FROM LEVEL</h2>
+                        </div>
+                        <div class="Button">
+                            <h2>EXTRAS (not coded in yet)</h2>
+                        </div>
+                        <div class="Button">
+                            <h2>OPTIONS</h2>
+                        </div>
+                        <div class="Button">
+                            <h2>QUIT</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="GameWindow">
+            <div id="LevelBackground">
+                <img src="assets/graphics/stage0-1graffiti.png">
+            </div>
+            <div id="ClickMark">
+                <img src="assets/graphics/mouseplacement.png">
+            </div>
+            <div id="GoalHole">
+                <img id="Hole" src="assets/graphics/goalhole.png">
+                <div id="FlagHolder">
+                    <img src="assets/graphics/goalflag.png">
+                </div>
+            </div>
+            <div id="CatGolf">
+                <img src="assets/graphics/canny.png">
+                <div id="PowerBar"></div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>

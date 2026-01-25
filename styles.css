@@ -1,0 +1,263 @@
+@font-face {
+    font-family: COMIC;
+    src: url(assets/fonts/COMIC.TTF);
+}
+
+* {
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    cursor: url('assets/graphics/mouse.png'), auto;
+}
+
+img {
+    pointer-events: none;
+}
+
+h1, h2, h3 {
+    color: white;
+    font-weight: normal;
+}
+
+#GameWindow {
+    width: 820px;
+    height: 820px;
+    background-color: #84AED9;
+}
+#GameWindow * {
+    position: absolute;
+}
+
+#CatGolf {
+    left: 35px;
+    top: 35px;
+    position: relative;
+}
+#CatGolf, #CatGolf img {
+    width: 54px;
+    height: 54px;
+}
+
+#ClickMark {
+    visibility: hidden;
+    z-index: 1;
+}
+#ClickMark img{
+    left: -11px;
+    top: -11px;
+    width: 21px;
+    height: 21px;
+}
+
+#PowerBar {
+    left: 27px;
+    top: 23px;
+    height: 8px;
+    background-color: darkred;
+    transform-origin: left;
+}
+
+#ThoughtBubble {
+    background-image: url(assets/graphics/catthoughtidisplayer9000.png);
+    background-size: cover;
+    width: 310px;
+    height: 310px;
+    bottom: 0;
+}
+
+#Thoughts {
+    width: 176.58px;
+    aspect-ratio: 1.22/1;
+    overflow: hidden;
+    left: 66px;
+    top: 36px;
+}
+#Thoughts img {
+    scale: 1.62;
+    transform-origin: left top;
+}
+
+#HUD {
+    background-image: url(assets/graphics/hudbg.png);
+    background-size: cover;
+    height: 820px;
+    width: 410px;
+    z-index: 1;
+    position: relative;
+    flex-shrink: 0;
+}
+#HUD * {
+    position: absolute;
+}
+#HUD #GameTitle {
+    width: 398px;
+    height: 220px;
+}
+
+#Thinker {
+    width: 140px;
+    bottom: 12px;
+    right: 12px;
+}
+
+#ScoreLabel {
+    bottom: 310px;
+    left: 15px;
+}
+
+#TimeLabel {
+    bottom: 380px;
+    left: 200px;
+    color: yellow;
+}
+
+#ResetLabel {
+    bottom: 345px;
+    left: 300px;
+    color: red;
+}
+
+#SkipsLabel {
+    bottom: 310px;
+    left: 300px;
+    color: turquoise;
+}
+
+#GolfHitLabel {
+    bottom: 440px;
+    left: 15px;
+}
+
+#LevelTimeLabel {
+    bottom: 370px;
+    left: 15px;
+}
+
+#StageNameLabel {
+    top: 200px;
+    left: 25px;
+    width: 350px;
+    text-align: center;
+    font-family: COMIC;
+    text-shadow: -2px -1px 0 black,
+            2px -1px 0 black,
+            -2px 1px 0 black,
+            2px 1px 0 black;
+}
+
+#LevelLabels {
+    position: static;
+    visibility: hidden;
+}
+
+#GoalHole {
+    top: 600px;
+    left: 520px;
+    position: relative;
+}
+
+#FlagHolder {
+    overflow: hidden;
+    left: 5px;
+    height: 200px;
+    width: 150px;
+}
+#FlagHolder img {
+    height: 200px;
+    width: 600px;
+}
+
+#Hole {
+    top: 149px;
+    width: 54px;
+    height: 54px;
+}
+
+#Manager {
+    display: flex;
+}
+
+#Menus > div{
+    position: absolute;
+    z-index: 2;
+    width: 820px;
+    height: 820px;
+}
+#Menus *:not(h2, .Button) {
+    position: absolute;
+}
+
+@keyframes scrolling {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 0 100%;
+    }
+}
+
+#MainMenu {
+    background-image: url(assets/graphics/canny.png);
+    background-size: 205px;
+    animation: scrolling 10s linear infinite;
+    background-color: rgba(71, 157, 255, 0.959);
+    background-blend-mode: multiply;
+}
+#MainMenu #GameTitle {
+    width: 580px;
+    left: 120px;
+    top: 120px;
+}
+#MainMenu #Cats {
+    width: 820px;
+}
+#MainMenu #Cats img {
+    width: 120px;
+    top: 200px;
+}
+#MainMenu #Cats #Cat1 {
+    left: 15px;
+}
+#MainMenu #Cats #Cat2 {
+    right: 15px;
+}
+#MainMenu .ButtonHolder {
+    top: 480px;
+    left: 120px;
+    width: 580px;
+}
+
+.ButtonHolder {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.Button  {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(0, 0, 0, .4);
+    border-radius: 6px;
+}
+.Button:hover {
+    background-color: rgba(43, 43, 43, 0.45);
+}
+.Button:active {
+    outline: solid 4px lightgrey;
+}
+.Button h2 {
+    text-align: center;
+    width: 100%;
+    margin: 12px;
+}
+
+#LevelBackground {
+    height: 820px;
+    width: 820px;
+    overflow: hidden;
+}
+#LevelBackground img {
+    height: 820px;
+}

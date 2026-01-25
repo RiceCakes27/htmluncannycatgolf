@@ -1,0 +1,313 @@
+const gamewindow = document.getElementById('GameWindow');
+const clickmarker = document.getElementById('ClickMark');
+const player = document.getElementById('CatGolf');
+const powerbar = document.getElementById('PowerBar');
+const bgmusic = document.getElementById('bgmusic');
+const goal = document.getElementById('GoalHole');
+const thoughts = document.getElementById('Thoughts').querySelector('img');
+
+let clickpoint, barlength, strokingIt;
+let strokes = 0;
+let ableToStroke = true;
+
+let thoughtsQueue = "";
+
+function addToQueue(animaname) {
+    thoughtsQueue = animaname;
+
+    if ((thoughtsQueue === "Money" && thoughts.src.includes("Money")) ||
+        (thoughtsQueue === "Skull" && thoughts.src.includes("Skull")) ||
+        (thoughtsQueue === "Chuckle" && thoughts.src.includes("Chuckle")) ||
+        (thoughtsQueue === "Car" && thoughts.src.includes("Car"))) {
+        thoughtsQueue = "";
+    } else {
+        think("Static", 1);
+    }
+}
+
+let globalTime = false;
+let randopick = 0;
+
+function onThoughtsAnimationFinished() {
+    if (thoughts.src.includes("Static")) {
+        switch (thoughtsQueue) {
+            case "Backrooms":
+            case "Dog":
+            case "Car":
+                randopick = getRandomInt(1, 1);
+                think(thoughtsQueue + randopick);
+                thoughtsQueue = "";
+                break;
+            case "Skull":
+            case "Chuckle":
+                randopick = getRandomInt(1, 3);
+                think(thoughtsQueue + randopick);
+                thoughtsQueue = "";
+                break;
+            case "Money":
+                randopick = getRandomInt(1, 2);
+                think(thoughtsQueue + randopick);
+                thoughtsQueue = "";
+                break;
+            case "Move":
+            case "Win":
+                randopick = getRandomInt(1, 7);
+                think(thoughtsQueue + randopick);
+                thoughtsQueue = "";
+                break;
+            case "Death":
+                randopick = getRandomInt(1, 11);
+                think(thoughtsQueue + randopick);
+                thoughtsQueue = "";
+                break;
+            default:
+                if (globalTime) {
+                    randopick = getRandomInt(1, 10);
+                    think("Idle" + randopick);
+                } else {
+                    think("Static");
+                }
+        }
+    } else if (thoughts.src.includes("Backrooms1")) {
+        think("Backrooms1");
+    } else {
+        think("Static");
+    }
+}
+
+// Utility function to generate random integers
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+let dontDoIt = false; // Flag to track if the function is running
+
+async function think(thought, priority = 0) {
+    if (priority == 1) {
+        dontDoIt = true;
+    }
+    
+    thoughts.src = `assets/graphics/TVThoughts/TV${thought}.png`;
+    await delay(83.33);
+    let scale = 1.62;
+    let frameWidth = 109*scale;
+    let frameHeight = 89*scale;
+    let image = thoughts;
+    let frames = Math.round(((image.width*scale)/frameWidth)*((image.height*scale)/frameHeight)-1);
+    await spriteAnim(image, frames, frameWidth, frameHeight, scale);
+
+    if (!dontDoIt || priority == 1) {
+        onThoughtsAnimationFinished();
+    }
+    if (priority == 1) {
+        dontDoIt = false;
+    }
+}
+
+function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1) {
+    return new Promise(resolve => {
+        for (let i = 0; i < frames; i++) {
+            setTimeout(() => {
+                image.style.left = image.style.left.split('px')[0]-frameWidth+'px';
+                if (image.style.left.split('px')[0]-frameWidth < -image.width*scale) {
+                    image.style.top = image.style.top.split('px')[0]-frameHeight+'px';
+                    image.style.left = 0;
+                }
+                if (i == frames-1) {
+                    image.style.left = 0;
+                    image.style.top = 0;
+                    resolve();
+                }
+            }, i * 83.33);
+        }
+        if (frames == 0) {
+            setTimeout(() => {
+                resolve();
+            }, 2000);
+        }
+    });
+}
+
+function mousemove(cursor) {
+    barlength = Math.min(Math.hypot(cursor.x - clickpoint.x, cursor.y - clickpoint.y), 300);
+
+    powerbar.style.width = barlength+'px';
+    powerbar.style.rotate = Math.atan2(clickpoint.y - cursor.y, clickpoint.x - cursor.x) * 180 / Math.PI+'deg';
+
+    if (barlength > 32) {
+        powerbar.style.opacity = 0.5;
+        //powerbar.style.backgroundColor = 'purple';
+    } else if (barlength < 32) {
+        powerbar.style.opacity = 1;
+    }
+}
+
+gamewindow.addEventListener('mousedown', (click) => {
+    if (ableToStroke) {
+        clickpoint = click;
+        strokingIt = true;
+
+        new Audio('assets/sounds/sfxWhistleGrab.ogg').play();
+
+        clickmarker.style.left = click.x+'px';
+        clickmarker.style.top = click.y+'px';
+        clickmarker.style.visibility = 'visible';
+
+        powerbar.style = null;
+        barlength = 0;
+        powerbar.style.visibility = 'visible';
+        
+        document.addEventListener('mousemove', mousemove);
+    }
+});
+
+document.addEventListener('mouseup', (click) => {
+    if (strokingIt) {
+        clickmarker.style.visibility = 'hidden';
+
+        powerbar.style.visibility = 'hidden';
+
+        document.removeEventListener('mousemove', mousemove);
+
+        if (barlength > 32) {
+            new Audio('assets/sounds/sfxSillyTwang2.ogg').play();
+
+            ableToStroke = false;
+            applyForce((clickpoint.x-click.x)/14, (clickpoint.y-click.y)/14);
+            
+            strokes++;
+            document.getElementById('GolfHitLabel').textContent = `Golf Hit: ${strokes}`
+        } else if (barlength < 32) {
+            new Audio('assets/sounds/sfxXylophoneCancel.ogg').play();
+        }
+        if (barlength > 150) {
+            addToQueue('Move');
+        }
+
+        strokingIt = false;
+    }
+});
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+setTimeout(() => {
+    think('Static');
+}, 500);
+document.querySelectorAll('#FlagHolder').forEach(element => {
+    let frameWidth = 150;
+    let frameHeight = 200;
+    let image = element.firstElementChild;
+    let frames = (image.width/frameWidth)*(image.height/frameHeight)-1
+    spriteAnim(image, frames, frameWidth, frameHeight);
+    setInterval(() => {
+        spriteAnim(image, frames, frameWidth, frameHeight);
+    }, frames*83.33);
+});
+
+const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
+const friction = 0.98; // Friction factor for slowing down
+const stopThreshold = 0.1;
+let isIntersected = false;
+
+function isIntersecting(rect1, rect2) {
+    return !(rect2.left > rect1.right || 
+             rect2.right < rect1.left || 
+             rect2.top > rect1.bottom || 
+             rect2.bottom < rect1.top);
+}
+
+function applyForce(forceX, forceY) {
+    speed.x += forceX;
+    speed.y += forceY;
+}
+
+function update() {
+    const playerRect = player.getBoundingClientRect();
+    const containerRect = gamewindow.getBoundingClientRect();
+    const goalRect = goal.querySelector('#Hole').getBoundingClientRect();
+
+    let leftOffset = document.getElementById('HUD').getBoundingClientRect().width;
+
+    player.style.left = playerRect.left-leftOffset + speed.x + 'px';
+    player.style.top = playerRect.top + speed.y + 'px';
+
+    // Check for wall collisions
+    if (playerRect.left < containerRect.left || playerRect.right > containerRect.right) {
+        speed.x *= -1; // Reverse x direction on collision
+        player.style.left = Math.max(containerRect.left-leftOffset, Math.min(playerRect.left-leftOffset + speed.x, containerRect.right - playerRect.width)) + 'px'; // Clamp position
+        new Audio('assets/sounds/sfxWallBump2.ogg').play();
+    }
+    if (playerRect.top < containerRect.top || playerRect.bottom > containerRect.bottom) {
+        speed.y *= -1; // Reverse y direction on collision
+        player.style.top = Math.max(containerRect.top, Math.min(playerRect.top + speed.y, containerRect.bottom - playerRect.height)) + 'px'; // Clamp position
+        new Audio('assets/sounds/sfxWallBump2.ogg').play();
+    }
+
+    // Check if goal
+    if (isIntersecting(playerRect, goalRect)) {
+        if (!isIntersected) {
+            new Audio('assets/sounds/sfxGoal.ogg').play();
+            addToQueue('Win')
+            isIntersected = true;
+        }
+    } else {
+        isIntersected = false; // Reset the flag when no longer intersecting
+    }
+
+    // Apply friction
+    speed.x *= friction;
+    speed.y *= friction;
+
+    // Check if the player is stopped
+    if (Math.abs(speed.x) < stopThreshold && Math.abs(speed.y) < stopThreshold) {
+        ableToStroke = true;
+    }
+
+    requestAnimationFrame(update); // Loop to continuously update
+}
+
+// Start the movement
+update();
+
+document.getElementById('StartButton').addEventListener('click', () => {
+    bgmusic.pause();
+    new Audio('assets/sounds/sfxHardMode.ogg').play();
+
+    let menu = document.getElementById('MainMenu');
+    let menuButtons = menu.querySelector('.ButtonHolder').style;
+
+    menuButtons.visibility = 'hidden';
+    menu.style.backgroundColor = 'rgba(0,0,0,.8)';
+    menu.style.backgroundImage = 'url(assets/graphics/uncanny.png)';
+    menu.querySelectorAll('#Cats img').forEach(car => {
+        car.src = 'assets/graphics/uncanny.png'
+    });
+
+    setTimeout(() => {
+        bgmusic.src = 'assets/music/Stage0Theme.ogg';
+        bgmusic.play();
+
+        new Audio('assets/sounds/sfxLevelStart2.ogg').play();
+
+        document.getElementById('LevelLabels').style.visibility = 'visible';
+
+        menu.style = null;
+        menu.style.visibility = 'hidden';
+        menuButtons.visibility = null;
+        menu.querySelectorAll('#Cats img').forEach(car => {
+            car.src = 'assets/graphics/canny.png'
+        });
+
+        globalTime = true;
+
+        let min = 0, sec = 0;
+        setInterval(() => {
+            sec++;
+            if (sec === 60) {
+                min++;
+                sec = 0;
+            }
+            document.getElementById('TimeLabel').textContent = `Total Time: ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        }, 1000);
+    }, 2000);
+});
