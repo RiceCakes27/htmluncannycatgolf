@@ -21,7 +21,7 @@ function addToQueue(animaname) {
         (thoughtsQueue === "Car" && thoughts.src.includes("Car"))) {
         thoughtsQueue = "";
     } else {
-        think("Static", 1);
+        //think("Static", 1);
     }
 }
 
