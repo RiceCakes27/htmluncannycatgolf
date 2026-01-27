@@ -5,12 +5,20 @@ const powerbar = document.getElementById('PowerBar');
 const bgmusic = document.getElementById('bgmusic');
 const goal = document.getElementById('GoalHole');
 const thoughts = document.getElementById('Thoughts').querySelector('img');
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
 let clickpoint, barlength, strokingIt;
 let strokes = 0;
 let ableToStroke = true;
-
 let thoughtsQueue = "";
+let globalTime = false;
+let randopick = 0;
+
+function playSound(sound) {
+    let sfx = new Audio(`assets/sounds/sfx${sound}.ogg`);
+    sfx.volume = 0.3;
+    sfx.play();
+}
 
 function addToQueue(animaname) {
     thoughtsQueue = animaname;
@@ -24,9 +32,6 @@ function addToQueue(animaname) {
         //think("Static", 1);
     }
 }
-
-let globalTime = false;
-let randopick = 0;
 
 function onThoughtsAnimationFinished() {
     if (thoughts.src.includes("Static")) {
@@ -75,7 +80,6 @@ function onThoughtsAnimationFinished() {
     }
 }
 
-// Utility function to generate random integers
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -86,15 +90,14 @@ async function think(thought, priority = 0) {
     if (priority == 1) {
         dontDoIt = true;
     }
-    
+
     thoughts.src = `assets/graphics/TVThoughts/TV${thought}.png`;
     await delay(83.33);
     let scale = 1.62;
     let frameWidth = 109*scale;
     let frameHeight = 89*scale;
-    let image = thoughts;
-    let frames = Math.round(((image.width*scale)/frameWidth)*((image.height*scale)/frameHeight)-1);
-    await spriteAnim(image, frames, frameWidth, frameHeight, scale);
+    let frames = Math.round(((thoughts.width*scale)/frameWidth)*((thoughts.height*scale)/frameHeight)-1);
+    await spriteAnim(thoughts, frames, frameWidth, frameHeight, scale);
 
     if (!dontDoIt || priority == 1) {
         onThoughtsAnimationFinished();
@@ -147,7 +150,7 @@ gamewindow.addEventListener('mousedown', (click) => {
         clickpoint = click;
         strokingIt = true;
 
-        new Audio('assets/sounds/sfxWhistleGrab.ogg').play();
+        playSound('WhistleGrab');
 
         clickmarker.style.left = click.x+'px';
         clickmarker.style.top = click.y+'px';
@@ -170,7 +173,7 @@ document.addEventListener('mouseup', (click) => {
         document.removeEventListener('mousemove', mousemove);
 
         if (barlength > 32) {
-            new Audio('assets/sounds/sfxSillyTwang2.ogg').play();
+            playSound('SillyTwang2');
 
             ableToStroke = false;
             applyForce((clickpoint.x-click.x)/14, (clickpoint.y-click.y)/14);
@@ -178,7 +181,7 @@ document.addEventListener('mouseup', (click) => {
             strokes++;
             document.getElementById('GolfHitLabel').textContent = `Golf Hit: ${strokes}`
         } else if (barlength < 32) {
-            new Audio('assets/sounds/sfxXylophoneCancel.ogg').play();
+            playSound('XylophoneCancel');
         }
         if (barlength > 150) {
             addToQueue('Move');
@@ -188,8 +191,7 @@ document.addEventListener('mouseup', (click) => {
     }
 });
 
-const delay = ms => new Promise(res => setTimeout(res, ms));
-
+//startup stuff
 setTimeout(() => {
     think('Static');
 }, 500);
@@ -204,6 +206,9 @@ document.querySelectorAll('#FlagHolder').forEach(element => {
     }, frames*83.33);
 });
 
+bgmusic.volume = 0.3;
+
+//physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
 const friction = 0.98; // Friction factor for slowing down
 const stopThreshold = 0.1;
@@ -235,19 +240,19 @@ function update() {
     if (playerRect.left < containerRect.left || playerRect.right > containerRect.right) {
         speed.x *= -1; // Reverse x direction on collision
         player.style.left = Math.max(containerRect.left-leftOffset, Math.min(playerRect.left-leftOffset + speed.x, containerRect.right - playerRect.width)) + 'px'; // Clamp position
-        new Audio('assets/sounds/sfxWallBump2.ogg').play();
+        playSound('WallBump2');
     }
     if (playerRect.top < containerRect.top || playerRect.bottom > containerRect.bottom) {
         speed.y *= -1; // Reverse y direction on collision
         player.style.top = Math.max(containerRect.top, Math.min(playerRect.top + speed.y, containerRect.bottom - playerRect.height)) + 'px'; // Clamp position
-        new Audio('assets/sounds/sfxWallBump2.ogg').play();
+        playSound('WallBump2');
     }
 
     // Check if goal
     if (isIntersecting(playerRect, goalRect)) {
         if (!isIntersected) {
-            new Audio('assets/sounds/sfxGoal.ogg').play();
-            addToQueue('Win')
+            playSound('Goal');
+            addToQueue('Win');
             isIntersected = true;
         }
     } else {
@@ -265,13 +270,13 @@ function update() {
 
     requestAnimationFrame(update); // Loop to continuously update
 }
-
 // Start the movement
 update();
 
+//menu buttons
 document.getElementById('StartButton').addEventListener('click', () => {
     bgmusic.pause();
-    new Audio('assets/sounds/sfxHardMode.ogg').play();
+    playSound('HardMode');
 
     let menu = document.getElementById('MainMenu');
     let menuButtons = menu.querySelector('.ButtonHolder').style;
@@ -287,7 +292,7 @@ document.getElementById('StartButton').addEventListener('click', () => {
         bgmusic.src = 'assets/music/Stage0Theme.ogg';
         bgmusic.play();
 
-        new Audio('assets/sounds/sfxLevelStart2.ogg').play();
+        playSound('LevelStart2');
 
         document.getElementById('LevelLabels').style.visibility = 'visible';
 
