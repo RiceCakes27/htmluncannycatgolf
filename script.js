@@ -16,7 +16,7 @@ let randopick = 0;
 
 function playSound(sound) {
     let sfx = new Audio(`assets/sounds/sfx${sound}.ogg`);
-    sfx.volume = 0.3;
+    sfx.volume = 0.2;
     sfx.play();
 }
 
@@ -29,7 +29,7 @@ function addToQueue(animaname) {
         (thoughtsQueue === "Car" && thoughts.src.includes("Car"))) {
         thoughtsQueue = "";
     } else {
-        //think("Static", 1);
+        think("Static");
     }
 }
 
@@ -84,49 +84,66 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-let dontDoIt = false; // Flag to track if the function is running
+async function think(thought) {
+    //console.log(thought);
 
-async function think(thought, priority = 0) {
-    if (priority == 1) {
-        dontDoIt = true;
-    }
-
+    clearInterval(frameController);
     thoughts.src = `assets/graphics/TVThoughts/TV${thought}.png`;
     await delay(83.33);
     let scale = 1.62;
     let frameWidth = 109*scale;
     let frameHeight = 89*scale;
     let frames = Math.round(((thoughts.width*scale)/frameWidth)*((thoughts.height*scale)/frameHeight)-1);
-    await spriteAnim(thoughts, frames, frameWidth, frameHeight, scale);
-
-    if (!dontDoIt || priority == 1) {
-        onThoughtsAnimationFinished();
+    switch (thought) {
+        case 'Chuckle1':
+        case 'Move1':
+        case 'Win3':
+            frames -= 1;
+        break;
+        case 'Idle3':
+            frames -= 21;
+        break;
     }
-    if (priority == 1) {
-        dontDoIt = false;
-    }
+    await spriteAnim(thoughts, frames, frameWidth, frameHeight, scale, true);
+    onThoughtsAnimationFinished();
 }
 
-function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1) {
+let frameController;
+
+function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = false) {
     return new Promise(resolve => {
-        for (let i = 0; i < frames; i++) {
+        let currentFrame = 0;
+        image.style.top = 0;
+        image.style.left = 0;
+        if (frames == 0) {
             setTimeout(() => {
+                resolve();
+            }, 2000);
+        } else {
+            function nextFrame() {
+                //console.log(currentFrame, frames);
+
                 image.style.left = image.style.left.split('px')[0]-frameWidth+'px';
                 if (image.style.left.split('px')[0]-frameWidth < -image.width*scale) {
                     image.style.top = image.style.top.split('px')[0]-frameHeight+'px';
                     image.style.left = 0;
                 }
-                if (i == frames-1) {
-                    image.style.left = 0;
+                if (currentFrame == frames) {
+                    currentFrame = 0
                     image.style.top = 0;
+                    image.style.left = 0;
                     resolve();
+                    //if (tv) clearInterval(frameController);
                 }
-            }, i * 83.33);
-        }
-        if (frames == 0) {
-            setTimeout(() => {
-                resolve();
-            }, 2000);
+                currentFrame++;
+            }
+            nextFrame();
+            if (tv) {
+                clearInterval(frameController);
+                frameController = setInterval(nextFrame, 83.33);
+            } else {
+                setInterval(nextFrame, 83.33);
+            }
         }
     });
 }
@@ -194,19 +211,16 @@ document.addEventListener('mouseup', (click) => {
 //startup stuff
 setTimeout(() => {
     think('Static');
-}, 500);
+}, 100);
 document.querySelectorAll('#FlagHolder').forEach(element => {
     let frameWidth = 150;
     let frameHeight = 200;
     let image = element.firstElementChild;
     let frames = (image.width/frameWidth)*(image.height/frameHeight)-1
     spriteAnim(image, frames, frameWidth, frameHeight);
-    setInterval(() => {
-        spriteAnim(image, frames, frameWidth, frameHeight);
-    }, frames*83.33);
 });
 
-bgmusic.volume = 0.3;
+bgmusic.volume = 0.2;
 
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
