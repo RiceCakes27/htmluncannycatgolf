@@ -150,15 +150,17 @@ function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = fals
 
 function mousemove(cursor) {
     barlength = Math.min(Math.hypot(cursor.x - clickpoint.x, cursor.y - clickpoint.y), 300);
+    let hue = (barlength / 300) * 260;
 
     powerbar.style.width = barlength+'px';
     powerbar.style.rotate = Math.atan2(clickpoint.y - cursor.y, clickpoint.x - cursor.x) * 180 / Math.PI+'deg';
 
-    if (barlength > 32) {
-        powerbar.style.opacity = 0.5;
-        //powerbar.style.backgroundColor = 'purple';
-    } else if (barlength < 32) {
+    if (barlength < 32) {
         powerbar.style.opacity = 1;
+        powerbar.style.backgroundColor = 'darkred';
+    } else {
+        powerbar.style.opacity = 0.5;
+        powerbar.style.backgroundColor = `hsl(${260 - hue}, 100%, 50%)`;
     }
 }
 
@@ -247,8 +249,8 @@ function update() {
 
     let leftOffset = document.getElementById('HUD').getBoundingClientRect().width;
 
-    player.style.left = playerRect.left-leftOffset + speed.x + 'px';
-    player.style.top = playerRect.top + speed.y + 'px';
+    player.style.left = playerRect.left-leftOffset + speed.x + window.pageXOffset + 'px';
+    player.style.top = playerRect.top + speed.y + window.pageYOffset + 'px';
 
     // Check for wall collisions
     if (playerRect.left < containerRect.left || playerRect.right > containerRect.right) {
