@@ -5,14 +5,17 @@ const powerbar = document.getElementById('PowerBar');
 const bgmusic = document.getElementById('bgmusic');
 const goal = document.getElementById('GoalHole');
 const thoughts = document.getElementById('Thoughts').querySelector('img');
+const stageresults = document.getElementById('StageResults');
+const timelabel = document.getElementById('TimeLabel');
+const leveltimelabel = document.getElementById('LevelTimeLabel');
+const golfhitlabel = document.getElementById('GolfHitLabel');
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
-let clickpoint, barlength, strokingIt;
-let strokes = 0;
+let clickpoint, barlength, strokingIt, frameController, levelTimer;
+let golfhit = 0, levelMins = 0, levelSecs = 0;
 let ableToStroke = true;
 let thoughtsQueue = "";
 let globalTime = false;
-let randopick = 0;
 
 function playSound(sound) {
     let sfx = new Audio(`assets/sounds/sfx${sound}.ogg`);
@@ -33,42 +36,40 @@ function addToQueue(animaname) {
     }
 }
 
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function onThoughtsAnimationFinished() {
     if (thoughts.src.includes("Static")) {
         switch (thoughtsQueue) {
             case "Backrooms":
             case "Dog":
             case "Car":
-                randopick = getRandomInt(1, 1);
-                think(thoughtsQueue + randopick);
+                think(thoughtsQueue + getRandomInt(1, 1));
                 thoughtsQueue = "";
                 break;
             case "Skull":
             case "Chuckle":
-                randopick = getRandomInt(1, 3);
-                think(thoughtsQueue + randopick);
+                think(thoughtsQueue + getRandomInt(1, 3));
                 thoughtsQueue = "";
                 break;
             case "Money":
-                randopick = getRandomInt(1, 2);
-                think(thoughtsQueue + randopick);
+                think(thoughtsQueue + getRandomInt(1, 2));
                 thoughtsQueue = "";
                 break;
             case "Move":
             case "Win":
-                randopick = getRandomInt(1, 7);
-                think(thoughtsQueue + randopick);
+                think(thoughtsQueue + getRandomInt(1, 7));
                 thoughtsQueue = "";
                 break;
             case "Death":
-                randopick = getRandomInt(1, 11);
-                think(thoughtsQueue + randopick);
+                think(thoughtsQueue + getRandomInt(1, 11));
                 thoughtsQueue = "";
                 break;
             default:
                 if (globalTime) {
-                    randopick = getRandomInt(1, 10);
-                    think("Idle" + randopick);
+                    think("Idle" + getRandomInt(1, 10));
                 } else {
                     think("Static");
                 }
@@ -78,10 +79,6 @@ function onThoughtsAnimationFinished() {
     } else {
         think("Static");
     }
-}
-
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 async function think(thought) {
@@ -107,8 +104,6 @@ async function think(thought) {
     await spriteAnim(thoughts, frames, frameWidth, frameHeight, scale, true);
     onThoughtsAnimationFinished();
 }
-
-let frameController;
 
 function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = false) {
     return new Promise(resolve => {
@@ -175,8 +170,8 @@ gamewindow.addEventListener('mousedown', (click) => {
         clickmarker.style.top = click.y+'px';
         clickmarker.style.visibility = 'visible';
 
-        powerbar.style = null;
         barlength = 0;
+        powerbar.style = null;
         powerbar.style.visibility = 'visible';
         
         document.addEventListener('mousemove', mousemove);
@@ -195,16 +190,14 @@ document.addEventListener('mouseup', (click) => {
             playSound('SillyTwang2');
 
             ableToStroke = false;
-            applyForce((clickpoint.x-click.x)/14, (clickpoint.y-click.y)/14);
+            applyForce((clickpoint.x-click.x)/42, (clickpoint.y-click.y)/42);
             
-            strokes++;
-            document.getElementById('GolfHitLabel').textContent = `Golf Hit: ${strokes}`
+            golfhit++;
+            golfhitlabel.textContent = `Golf Hit: ${golfhit}`
         } else if (barlength < 32) {
             playSound('XylophoneCancel');
         }
-        if (barlength > 150) {
-            addToQueue('Move');
-        }
+        if (barlength > 150) addToQueue('Move');
 
         strokingIt = false;
     }
@@ -226,8 +219,9 @@ bgmusic.volume = 0.2;
 
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
-const friction = 0.98; // Friction factor for slowing down
-const stopThreshold = 0.1;
+const friction = 0.9965; // Friction factor for slowing down
+const stopThreshold = 0.5;
+const slowFactor = 0.0006;
 let isIntersected = false;
 
 function isIntersecting(rect1, rect2) {
@@ -246,11 +240,7 @@ function update() {
     const playerRect = player.getBoundingClientRect();
     const containerRect = gamewindow.getBoundingClientRect();
     const goalRect = goal.querySelector('#Hole').getBoundingClientRect();
-
-    let leftOffset = document.getElementById('HUD').getBoundingClientRect().width;
-
-    player.style.left = playerRect.left-leftOffset + speed.x + window.pageXOffset + 'px';
-    player.style.top = playerRect.top + speed.y + window.pageYOffset + 'px';
+    const leftOffset = document.getElementById('HUD').getBoundingClientRect().width;
 
     // Check for wall collisions
     if (playerRect.left < containerRect.left || playerRect.right > containerRect.right) {
@@ -268,20 +258,69 @@ function update() {
     if (isIntersecting(playerRect, goalRect)) {
         if (!isIntersected) {
             playSound('Goal');
+
             addToQueue('Win');
+
+            let golfhitbonus;
+            if (golfhit <= 1) {
+                golfhitbonus = 10000;
+            } else {
+                golfhitbonus = 6000 - 500 * golfhit;
+                if (golfhitbonus < 0 || golfhitbonus > 5000) golfhitbonus = 0;
+            }
+
+            let timebonus = 6000 - 100 * (levelMins*60 + levelSecs);
+            if (timebonus < 0) timebonus = 0;
+
+            let finalbonus = golfhitbonus + timebonus;// + collectiblebous;
+
+            let golfhitr = document.getElementById('GolfHitR');
+            if (golfhit > 1) {
+                golfhitr.textContent = 'Golf Hit Bonus: '+golfhitbonus;
+            } else {
+                golfhitr.textContent = `HOLE IN ${golfhit == 0 ? 'NONE' : 'ONE'}! Bonus: ${golfhitbonus}`;
+                golfhitr.style.color = 'limegreen';
+            }
+
+            document.getElementById('TimeTakenR').textContent = 'Time Bonus: '+timebonus;
+            document.getElementById('FinalScoreR').textContent = 'Final Stage Score: '+finalbonus;
+
+            stageresults.style.visibility = 'visible';
+            stageresults.classList.add('getDownHere');
+            let results = stageresults.querySelectorAll('h1, #RankTextR');
+            for (let i = 0; i < results.length; i++) {
+                setTimeout(() => {
+                    results[i].style.visibility = 'visible';
+                    playSound('ResultsBang');
+                }, 1600 + i*300);
+                
+            }
+
+            clearInterval(levelTimer);
+
             isIntersected = true;
         }
     } else {
         isIntersected = false; // Reset the flag when no longer intersecting
     }
 
+    player.style.left = playerRect.left-leftOffset + speed.x + window.pageXOffset + 'px';
+    player.style.top = playerRect.top + speed.y + window.pageYOffset + 'px';
+
+    const speedMagnitude = Math.sqrt(speed.x ** 2 + speed.y ** 2);
+    
+    // Apply dynamic friction: the slower the ball, the more friction applied
+    const dynamicFriction = friction + slowFactor * (1 - Math.min(speedMagnitude / 1.03, 1));
+
     // Apply friction
-    speed.x *= friction;
-    speed.y *= friction;
+    speed.x *= dynamicFriction;
+    speed.y *= dynamicFriction;
 
     // Check if the player is stopped
-    if (Math.abs(speed.x) < stopThreshold && Math.abs(speed.y) < stopThreshold) {
+    if (speedMagnitude < stopThreshold) {
         ableToStroke = true;
+        speed.x = 0;
+        speed.y = 0;
     }
 
     requestAnimationFrame(update); // Loop to continuously update
@@ -308,8 +347,6 @@ document.getElementById('StartButton').addEventListener('click', () => {
         bgmusic.src = 'assets/music/Stage0Theme.ogg';
         bgmusic.play();
 
-        playSound('LevelStart2');
-
         document.getElementById('LevelLabels').style.visibility = 'visible';
 
         menu.style = null;
@@ -328,7 +365,42 @@ document.getElementById('StartButton').addEventListener('click', () => {
                 min++;
                 sec = 0;
             }
-            document.getElementById('TimeLabel').textContent = `Total Time: ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+            timelabel.textContent = `Total Time: ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }, 1000);
+
+        startLevel();
     }, 2000);
 });
+
+function startLevel(level) {
+    playSound('LevelStart2');
+
+    let stagenamelabel = document.getElementById('StageNameLabel');
+    stagenamelabel.classList.add('stageLabel');
+
+    golfhitlabel.textContent = 'Golf Hit: 0';
+    leveltimelabel.textContent = 'Time: 00:00';
+
+    stageresults.style = null;
+    stageresults.classList = '';
+    stageresults.querySelectorAll('h1, #RankTextR').forEach((text) => {
+        text.style = null;
+    });
+
+    levelMins = 0, levelSecs = 0;
+    clearInterval(levelTimer);
+    setTimeout(() => {
+        playSound('PickUpNotif');
+
+        stagenamelabel.classList = '';
+
+        levelTimer = setInterval(() => {
+            levelSecs++;
+            if (levelSecs === 60) {
+                levelMins++;
+                levelSecs = 0;
+            }
+            leveltimelabel.textContent = `Time: ${String(levelMins).padStart(2, '0')}:${String(levelSecs).padStart(2, '0')}`;
+        }, 1000);
+    }, 1000);
+}

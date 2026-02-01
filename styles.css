@@ -57,7 +57,7 @@ h1, h2, h3 {
     top: 23px;
     height: 8px;
     background-color: darkred;
-    transform-origin: left;
+    transform-origin: left center;
 }
 
 #ThoughtBubble {
@@ -148,6 +148,22 @@ h1, h2, h3 {
             2px 1px 0 black;
 }
 
+@keyframes stagelabel {
+    0% {
+        left: 100vw;
+    }
+    45%, 55% {
+        /*fix*/
+    }
+    100% {
+        left: 25px;
+    }
+}
+
+.stageLabel {
+    animation: stagelabel 1s;
+}
+
 #LevelLabels {
     position: static;
     visibility: hidden;
@@ -228,6 +244,57 @@ h1, h2, h3 {
     top: 480px;
     left: 120px;
     width: 580px;
+}
+
+@keyframes down {
+    from {
+        top: -100%;
+    }
+    to {
+        top: 0;
+    }
+}
+
+.getDownHere {
+    animation: down 1.5s;
+}
+
+#StageResults {
+    visibility: hidden;
+    background-image: url(assets/graphics/resultsclipboard.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+#StageResults #StageClear {
+    width: 500px;
+    top: 130px;
+    left: 160px;
+}
+#StageResults h1 {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    left: 60px;
+    font-size: 25px;
+    visibility: hidden;
+}
+#GolfHitR {
+    top: 238px;
+}
+#TimeTakenR {
+    top: 288px;
+}
+#CollectibleScoreR {
+    top: 338px;
+}
+#FinalScoreR {
+    top: 438px;
+    color: yellow;
+}
+#RankTextR {
+    width: 300px;
+    left: 440px;
+    top: 230px;
+    visibility: hidden;
 }
 
 .ButtonHolder {
