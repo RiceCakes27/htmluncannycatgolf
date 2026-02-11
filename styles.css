@@ -156,9 +156,16 @@ h1, h2, h3 {
     left: 15px;
 }
 
-#StageNameLabel {
-    top: 200px;
+#StageNameLabelParent {
+    top: 220px;
     left: 25px;
+    width: 350px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+}
+#StageNameLabel {
+    margin: 0;
     width: 350px;
     text-align: center;
     font-family: COMIC;
