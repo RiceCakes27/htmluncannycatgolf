@@ -36,9 +36,29 @@ h1, h2, h3 {
     top: 35px;
     position: relative;
 }
-#CatGolf, #CatGolf img {
+#UncannyCats {
+    top: 0;
+}
+#UncannyCats div {
+    left: 755px;
+    top: 28px;
+    position: relative;
+}
+#CatGolf, #CatGolf img, #UncannyCats div, #UncannyCats div img {
     width: 54px;
     height: 54px;
+}
+#CatGolf.grow img {
+    animation: grow 1s;
+}
+
+@keyframes grow {
+    from {
+        transform: scale(0.1);
+    }
+    to {
+        transform: scale(1);
+    }
 }
 
 #ClickMark {
@@ -150,10 +170,13 @@ h1, h2, h3 {
 
 @keyframes stagelabel {
     0% {
-        left: 100vw;
+        left: 1230px;
     }
-    45%, 55% {
-        /*fix*/
+    26.6% {
+        left: 698px;
+    }
+    73.3% {
+        left: 746px;
     }
     100% {
         left: 25px;
@@ -161,7 +184,7 @@ h1, h2, h3 {
 }
 
 .stageLabel {
-    animation: stagelabel 1s;
+    animation: stagelabel 1.5s;
 }
 
 #LevelLabels {
@@ -245,6 +268,13 @@ h1, h2, h3 {
     left: 120px;
     width: 580px;
 }
+#MainMenu #SplashLabel {
+    font-family: Arial, Helvetica, sans-serif;
+    top: 400px;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
 
 @keyframes down {
     from {
@@ -259,12 +289,17 @@ h1, h2, h3 {
     animation: down 1.5s;
 }
 
-#StageResults {
+#StageResults, #UncannyDeath {
     visibility: hidden;
-    background-image: url(assets/graphics/resultsclipboard.png);
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+}
+#UncannyDeath {
+    background-image: url(assets/graphics/uncanny.png);
+}
+#StageResults {
+    background-image: url(assets/graphics/resultsclipboard.png);
 }
 #StageResults #StageClear {
     width: 500px;

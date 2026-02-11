@@ -9,13 +9,25 @@ const stageresults = document.getElementById('StageResults');
 const timelabel = document.getElementById('TimeLabel');
 const leveltimelabel = document.getElementById('LevelTimeLabel');
 const golfhitlabel = document.getElementById('GolfHitLabel');
+const resetlabel = document.getElementById('ResetLabel');
+const splashtext = document.getElementById('SplashLabel');
+const uncannydeath = document.getElementById('UncannyDeath');
 const delay = ms => new Promise(res => setTimeout(res, ms));
+const splash = [
+	"honestly quite incredible",
+	"golf for life",
+	"yo mama",
+	"jorkd too hard peenar fell off",
+	"why so serious batman?",
+    "RiceCakes27 is pretty cool"
+];
 
 let clickpoint, barlength, strokingIt, frameController, levelTimer;
-let golfhit = 0, levelMins = 0, levelSecs = 0;
-let ableToStroke = true;
+let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0;
+let level = 1;
+let notMoving = true;
+let globalTime = false, ableToStroke = false;
 let thoughtsQueue = "";
-let globalTime = false;
 
 function playSound(sound) {
     let sfx = new Audio(`assets/sounds/sfx${sound}.ogg`);
@@ -160,7 +172,7 @@ function mousemove(cursor) {
 }
 
 gamewindow.addEventListener('mousedown', (click) => {
-    if (ableToStroke) {
+    if (notMoving && ableToStroke) {
         clickpoint = click;
         strokingIt = true;
 
@@ -189,7 +201,7 @@ document.addEventListener('mouseup', (click) => {
         if (barlength > 32) {
             playSound('SillyTwang2');
 
-            ableToStroke = false;
+            notMoving = false;
             applyForce((clickpoint.x-click.x)/42, (clickpoint.y-click.y)/42);
             
             golfhit++;
@@ -217,12 +229,31 @@ document.querySelectorAll('#FlagHolder').forEach(element => {
 
 bgmusic.volume = 0.2;
 
+splashtext.textContent = splash[getRandomInt(0, splash.length-1)];
+
+uncannydeath.addEventListener('click', () => {
+    uncannydeath.style = null;
+
+    resets++;
+    resetlabel.textContent = 'Resets: '+resets;
+
+    startLevel();
+});
+
+stageresults.addEventListener('click', () => {
+    if (stageresults.querySelector('#TimeTakenR').style.visibility == 'visible') {
+        level++;
+        startLevel();
+    }
+});
+
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
 const friction = 0.9965; // Friction factor for slowing down
 const stopThreshold = 0.5;
 const slowFactor = 0.0006;
 let isIntersected = false;
+let isIntersectedUncanny = false;
 
 function isIntersecting(rect1, rect2) {
     return !(rect2.left > rect1.right || 
@@ -261,6 +292,8 @@ function update() {
 
             addToQueue('Win');
 
+            ableToStroke = false;
+
             let golfhitbonus;
             if (golfhit <= 1) {
                 golfhitbonus = 10000;
@@ -288,10 +321,13 @@ function update() {
             stageresults.style.visibility = 'visible';
             stageresults.classList.add('getDownHere');
             let results = stageresults.querySelectorAll('h1, #RankTextR');
+            let prevlevel = level;
             for (let i = 0; i < results.length; i++) {
                 setTimeout(() => {
-                    results[i].style.visibility = 'visible';
-                    playSound('ResultsBang');
+                    if (prevlevel == level) {
+                        results[i].style.visibility = 'visible';
+                        playSound('ResultsBang');
+                    }
                 }, 1600 + i*300);
                 
             }
@@ -303,6 +339,24 @@ function update() {
     } else {
         isIntersected = false; // Reset the flag when no longer intersecting
     }
+
+    document.querySelectorAll('#UncannyCats div').forEach(uncanny => {
+        if (isIntersecting(playerRect, uncanny.getBoundingClientRect())) {
+            if (!isIntersectedUncanny) {
+                playSound('UncannyDeath');
+
+                speed.x = 0;
+                speed.y = 0;
+
+                uncannydeath.style.visibility = 'visible';
+
+                isIntersectedUncanny = true;
+            }
+        } else {
+            isIntersectedUncanny = false; // Reset the flag when no longer intersecting
+        }
+    });
+
 
     player.style.left = playerRect.left-leftOffset + speed.x + window.pageXOffset + 'px';
     player.style.top = playerRect.top + speed.y + window.pageYOffset + 'px';
@@ -318,7 +372,7 @@ function update() {
 
     // Check if the player is stopped
     if (speedMagnitude < stopThreshold) {
-        ableToStroke = true;
+        notMoving = true;
         speed.x = 0;
         speed.y = 0;
     }
@@ -356,6 +410,8 @@ document.getElementById('StartButton').addEventListener('click', () => {
             car.src = 'assets/graphics/canny.png'
         });
 
+        splashtext.textContent = splash[getRandomInt(0, splash.length-1)];
+
         globalTime = true;
 
         let min = 0, sec = 0;
@@ -372,12 +428,30 @@ document.getElementById('StartButton').addEventListener('click', () => {
     }, 2000);
 });
 
-function startLevel(level) {
+function startLevel() {
     playSound('LevelStart2');
 
     let stagenamelabel = document.getElementById('StageNameLabel');
     stagenamelabel.classList.add('stageLabel');
 
+    switch (world) {
+        case 0:
+            switch (level) {
+                case 1:
+                    player.style = null;
+                    goal.style = null;
+                    //also reset uncanny
+                    stagenamelabel.textContent = '0-1: Welcome to Uncanny Cat Golf!';
+                break;
+                case 2:
+                    //new positions
+                    stagenamelabel.textContent = '0-2: Hello, Walls';
+                break;
+            }
+        break;
+    }
+
+    golfhit = 0;
     golfhitlabel.textContent = 'Golf Hit: 0';
     leveltimelabel.textContent = 'Time: 00:00';
 
@@ -387,12 +461,20 @@ function startLevel(level) {
         text.style = null;
     });
 
+    player.classList.add('grow');
+
     levelMins = 0, levelSecs = 0;
     clearInterval(levelTimer);
     setTimeout(() => {
         playSound('PickUpNotif');
 
-        stagenamelabel.classList = '';
+        setTimeout(() => {
+            stagenamelabel.classList = '';
+        }, 500);
+
+        player.classList.remove('grow');
+
+        ableToStroke = true;
 
         levelTimer = setInterval(() => {
             levelSecs++;
