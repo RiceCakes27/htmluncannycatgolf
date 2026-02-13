@@ -235,6 +235,9 @@ h1, h2, h3 {
 #Menus *:not(h2, .Button) {
     position: absolute;
 }
+#Menus h2 {
+    font-family: Arial, Helvetica, sans-serif;
+}
 
 @keyframes scrolling {
     from {
@@ -276,8 +279,10 @@ h1, h2, h3 {
     width: 580px;
 }
 #MainMenu #SplashLabel {
-    font-family: Arial, Helvetica, sans-serif;
     top: 400px;
+}
+
+.centerdText {
     position: absolute;
     text-align: center;
     width: 100%;
@@ -296,7 +301,7 @@ h1, h2, h3 {
     animation: down 1.5s;
 }
 
-#StageResults, #UncannyDeath {
+#StageResults, #UncannyDeath, #LevelSelect {
     visibility: hidden;
     background-repeat: no-repeat;
     background-size: contain;
@@ -343,10 +348,10 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    justify-content: center;
 }
 
 .Button  {
-    font-family: Arial, Helvetica, sans-serif;
     background-color: rgba(0, 0, 0, .4);
     border-radius: 6px;
 }
@@ -359,7 +364,7 @@ h1, h2, h3 {
 .Button h2 {
     text-align: center;
     width: 100%;
-    margin: 12px;
+    margin: 12px 0 12px 0;
 }
 
 #LevelBackground {
@@ -369,4 +374,49 @@ h1, h2, h3 {
 }
 #LevelBackground img {
     height: 820px;
+}
+
+#LevelSelect {
+    background-image: url(assets/graphics/nicescenery.png);
+}
+#LevelSelect #LevelSelectText{
+    width: 630px;
+    top: 40px;
+    left: 95px;
+}
+#LevelSelect #WorldLabel {
+    top: 200px;
+}
+#LevelSelect #LevelLabel {
+    top: 340px;
+}
+#LevelSelect .ButtonHolder {
+    width: 820px;
+    flex-direction: row;
+}
+#LevelSelect #WorldButtons {
+    top: 260px;
+    gap: 20px;
+}
+#LevelSelect #LevelButtons {
+    top: 400px;
+}
+#LevelSelect #WorldButtons .Button {
+    padding: 0 18px 0 18px;
+}
+#LevelSelect #LevelButtons .Button {
+    padding: 0 7px 0 7px;
+}
+#LevelSelect #ChoiceDisplay {
+    top: 480px;
+    font-size: 60px;
+}
+#LevelSelect #Confirm {
+    width: 200px;
+    height: 100px;
+    top: 655px;
+    left: 310px;
+    position: relative;
+    display: flex;
+    align-items: center;
 }

@@ -12,6 +12,8 @@ const golfhitlabel = document.getElementById('GolfHitLabel');
 const resetlabel = document.getElementById('ResetLabel');
 const splashtext = document.getElementById('SplashLabel');
 const uncannydeath = document.getElementById('UncannyDeath');
+const levelselectmenu = document.getElementById('LevelSelect');
+const levelselectdisplay = document.getElementById('ChoiceDisplay');
 const delay = ms => new Promise(res => setTimeout(res, ms));
 const splash = [
 	"honestly quite incredible",
@@ -21,6 +23,15 @@ const splash = [
 	"why so serious batman?",
     "RiceCakes27 is pretty cool"
 ];
+const rankings = [
+	"RankPeak", 
+	"RankSwag",
+	"RankOK",
+	"RankBelowAverage",
+	"RankAwful",
+	"RankUncanny",
+	"NoRank"
+]
 
 let clickpoint, barlength, strokingIt, frameController, levelTimer;
 let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0;
@@ -157,7 +168,6 @@ function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = fals
 
 function mousemove(cursor) {
     barlength = Math.min(Math.hypot(cursor.x - clickpoint.x, cursor.y - clickpoint.y), 300);
-    let hue = (barlength / 300) * 260;
 
     powerbar.style.width = barlength+'px';
     powerbar.style.rotate = Math.atan2(clickpoint.y - cursor.y, clickpoint.x - cursor.x) * 180 / Math.PI+'deg';
@@ -167,7 +177,7 @@ function mousemove(cursor) {
         powerbar.style.backgroundColor = 'darkred';
     } else {
         powerbar.style.opacity = 0.5;
-        powerbar.style.backgroundColor = `hsl(${260 - hue}, 100%, 50%)`;
+        powerbar.style.backgroundColor = `hsl(${260 - (barlength / 300) * 260}, 100%, 50%)`;
     }
 }
 
@@ -246,6 +256,32 @@ stageresults.addEventListener('click', () => {
         startLevel();
     }
 });
+
+document.getElementById('LevelSelectButton').addEventListener('click', () => levelselectmenu.style.visibility = 'visible');
+
+function updateLevelDisplay(type, button) {
+    const value = button.firstElementChild.textContent;
+    if (type === 'world') world = Number(value);
+    else level = Number(value);
+    levelselectdisplay.textContent = `${world}-${level}`;
+}
+
+document.getElementById('WorldButtons').addEventListener('click', (e) => {
+    const button = e.target.closest('.Button');
+    if (button) updateLevelDisplay('world', button);
+});
+
+document.getElementById('LevelButtons').addEventListener('click', (e) => {
+    const button = e.target.closest('.Button');
+    if (button) updateLevelDisplay('level', button);
+});
+
+document.getElementById('Confirm').addEventListener('click', () => {
+    levelselectmenu.style = null;
+    startLevelFromMenu();
+});
+
+document.getElementById('StartButton').addEventListener('click', () => startLevelFromMenu());
 
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
@@ -382,8 +418,7 @@ function update() {
 // Start the movement
 update();
 
-//menu buttons
-document.getElementById('StartButton').addEventListener('click', () => {
+function startLevelFromMenu() {
     bgmusic.pause();
     playSound('HardMode');
 
@@ -426,13 +461,15 @@ document.getElementById('StartButton').addEventListener('click', () => {
 
         startLevel();
     }, 2000);
-});
+}
 
 function startLevel() {
     playSound('LevelStart2');
 
     let stagenamelabel = document.getElementById('StageNameLabel');
     stagenamelabel.classList.add('stageLabel');
+
+    let levelbackground = document.getElementById('LevelBackground').firstElementChild;
 
     switch (world) {
         case 0:
@@ -444,11 +481,47 @@ function startLevel() {
                     stagenamelabel.textContent = '0-1: Welcome to Uncanny Cat Golf!';
                 break;
                 case 2:
-                    //new positions
+                    player.style.top = '383px';
+                    player.style.left = '230px';
+                    goal.style.top = '234px';
+                    goal.style.left = '665px';
                     stagenamelabel.textContent = '0-2: Hello, Walls';
+                    levelbackground.style.left = '-820px'
                 break;
+                default:
+                    level = 1;
             }
         break;
+        case 1:
+            switch (level) {
+                default:
+                    level = 1;
+                    world = 0;
+            }
+        break;
+        case 2:
+            switch (level) {
+                default:
+                    level = 1;
+                    world = 0;
+            }
+        break;
+        case 3:
+            switch (level) {
+                default:
+                    level = 1;
+                    world = 0;
+            }
+        break;
+        case 4:
+            switch (level) {
+                default:
+                    level = 1;
+                    world = 0;
+            }
+        break;
+        default:
+            world = 0;
     }
 
     golfhit = 0;
