@@ -23,15 +23,27 @@ const splash = [
 	"why so serious batman?",
     "RiceCakes27 is pretty cool"
 ];
-const rankings = [
-	"RankPeak", 
-	"RankSwag",
-	"RankOK",
-	"RankBelowAverage",
-	"RankAwful",
-	"RankUncanny",
-	"NoRank"
-]
+const rankings = [{
+        rank: "RankPeak",
+        sfx: "PeakWin"
+    },{
+        rank: "RankSwag",
+        sfx: "Swag"
+    },{
+        rank: "RankOK",
+        sfx: "Okay"
+    },{
+        rank: "RankBelowAverage",
+        sfx: "UhOhWavySynth"
+    },{
+        rank: "RankAwful",
+        sfx: "EpicFail"
+    },{
+        rank: "RankUncanny",
+    },{
+        rank: "NoRank",
+        sfx: "XylophoneCancel"
+}];
 
 let clickpoint, barlength, strokingIt, frameController, levelTimer;
 let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0;
@@ -39,6 +51,7 @@ let level = 1;
 let notMoving = true;
 let globalTime = false, ableToStroke = false;
 let thoughtsQueue = "";
+let peak_value = 12000;
 
 function playSound(sound) {
     let sfx = new Audio(`assets/sounds/sfx${sound}.ogg`);
@@ -365,8 +378,17 @@ function update() {
                         playSound('ResultsBang');
                     }
                 }, 1600 + i*300);
-                
             }
+            setTimeout(() => {
+                document.getElementById('RankHolder').style.visibility = 'visible';
+                if (finalbonus <= 0) {
+                    //$StageResults/Rank/AnimationPlayer.play("RankUncanny")
+                } else {
+                    let rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
+                    //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
+                    playSound(rankings[rank_number].sfx);
+                }
+            }, 1600 + results.length*300);
 
             clearInterval(levelTimer);
 
@@ -475,12 +497,14 @@ function startLevel() {
         case 0:
             switch (level) {
                 case 1:
+                    peak_value = 12000;
                     player.style = null;
                     goal.style = null;
                     //also reset uncanny
                     stagenamelabel.textContent = '0-1: Welcome to Uncanny Cat Golf!';
                 break;
                 case 2:
+                    peak_value = 10000;
                     player.style.top = '383px';
                     player.style.left = '230px';
                     goal.style.top = '234px';
