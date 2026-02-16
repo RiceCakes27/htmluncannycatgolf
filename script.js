@@ -301,8 +301,8 @@ const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
 const friction = 0.9965; // Friction factor for slowing down
 const stopThreshold = 0.5;
 const slowFactor = 0.0006;
+const intersectedUncannyCats = new Set();
 let isIntersected = false;
-let isIntersectedUncanny = false;
 
 function isIntersecting(rect1, rect2) {
     return !(rect2.left > rect1.right || 
@@ -380,13 +380,15 @@ function update() {
                 }, 1600 + i*300);
             }
             setTimeout(() => {
-                document.getElementById('RankHolder').style.visibility = 'visible';
-                if (finalbonus <= 0) {
-                    //$StageResults/Rank/AnimationPlayer.play("RankUncanny")
-                } else {
-                    let rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
-                    //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
-                    playSound(rankings[rank_number].sfx);
+                if (prevlevel == level) {
+                    document.getElementById('RankHolder').style.visibility = 'visible';
+                    if (finalbonus <= 0) {
+                        //$StageResults/Rank/AnimationPlayer.play("RankUncanny")
+                    } else {
+                        let rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
+                        //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
+                        playSound(rankings[rank_number].sfx);
+                    }
                 }
             }, 1600 + results.length*300);
 
@@ -398,9 +400,10 @@ function update() {
         isIntersected = false; // Reset the flag when no longer intersecting
     }
 
+    // Check if uncanny cat
     document.querySelectorAll('#UncannyCats div').forEach(uncanny => {
         if (isIntersecting(playerRect, uncanny.getBoundingClientRect())) {
-            if (!isIntersectedUncanny) {
+            if (!intersectedUncannyCats.has(uncanny)) {
                 playSound('UncannyDeath');
 
                 speed.x = 0;
@@ -408,10 +411,10 @@ function update() {
 
                 uncannydeath.style.visibility = 'visible';
 
-                isIntersectedUncanny = true;
+                intersectedUncannyCats.add(uncanny);
             }
         } else {
-            isIntersectedUncanny = false; // Reset the flag when no longer intersecting
+            intersectedUncannyCats.delete(uncanny); // Reset the flag when no longer intersecting
         }
     });
 
