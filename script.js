@@ -310,7 +310,7 @@ const friction = 0.9965; // Friction factor for slowing down
 const stopThreshold = 0.5;
 const slowFactor = 0.0006;
 const intersectedUncannyCats = new Set();
-let isIntersected = false;
+let onGoal = false;
 
 function isIntersecting(rect1, rect2) {
     return !(rect2.left > rect1.right || 
@@ -344,7 +344,7 @@ function update() {
 
     // Check if goal
     if (isIntersecting(playerRect, goalRect)) {
-        if (!isIntersected) {
+        if (!onGoal) {
             playSound('Goal');
 
             addToQueue('Win');
@@ -401,10 +401,10 @@ function update() {
 
             clearInterval(levelTimer);
 
-            isIntersected = true;
+            onGoal = true;
         }
     } else {
-        isIntersected = false; // Reset the flag when no longer intersecting
+        onGoal = false; // Reset the flag when no longer intersecting
     }
 
     // Check if uncanny cat
@@ -507,10 +507,6 @@ function ontoNextWorld() {
 }
 
 function startLevel() {
-    playSound('LevelStart2');
-
-    stagenamelabel.classList.add('stageLabel');
-
     const levelbackground = document.getElementById('LevelBackground').firstElementChild;
 
     switch (world) {
@@ -531,7 +527,10 @@ function startLevel() {
                     goal.style.top = '234px';
                     goal.style.left = '665px';
                     stagenamelabel.textContent = '0-2: Hello, Walls';
-                    levelbackground.style.left = '-820px'
+                    levelbackground.style.left = '-820px';
+                    
+                    //testing below
+                    //document.getElementById('Tiles').querySelector('#w1l2').style.visibility = 'visible';
                 break;
                 default:
                     ontoNextWorld();
@@ -541,35 +540,51 @@ function startLevel() {
         case 1:
             bgmusicset('Stage1Theme');
             switch (level) {
+                case 1:
+                    //stuff
+                break;
                 default:
-                    //ontoNextWorld();
-                    //return;
+                    ontoNextWorld();
+                    return;
             }
         break;
         case 2:
             bgmusicset('Stage2Theme');
             switch (level) {
+                case 1:
+                    //stuff
+                break;
                 default:
-                    //ontoNextWorld();
-                    //return;
+                    ontoNextWorld();
+                    return;
             }
         break;
         case 3:
             bgmusicset('Stage3Theme');
             switch (level) {
+                case 1:
+                    //stuff
+                break;
                 default:
-                    //ontoNextWorld();
-                    //return;
+                    ontoNextWorld();
+                    return;
             }
         break;
         case 4:
             bgmusicset('Stage4Theme');
             switch (level) {
+                case 1:
+                    //stuff
+                break;
                 default:
                     //win game
             }
         break;
     }
+
+    playSound('LevelStart2');
+
+    stagenamelabel.classList.add('stageLabel');
 
     golfhit = 0;
     golfhitlabel.textContent = 'Golf Hit: 0';
