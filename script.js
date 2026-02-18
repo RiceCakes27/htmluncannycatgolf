@@ -461,8 +461,6 @@ function startLevelFromMenu() {
     });
 
     setTimeout(() => {
-        bgmusic.src = 'assets/music/Stage0Theme.ogg';
-        bgmusic.play();
 
         document.getElementById('LevelLabels').style.visibility = 'visible';
 
@@ -501,6 +499,8 @@ function startLevel() {
 
     switch (world) {
         case 0:
+            bgmusic.src = 'assets/music/Stage0Theme.ogg';
+            bgmusic.play();
             switch (level) {
                 case 1:
                     peak_value = 12000;
@@ -523,6 +523,8 @@ function startLevel() {
             }
         break;
         case 1:
+            bgmusic.src = 'assets/music/Stage1Theme.ogg';
+            bgmusic.play();
             switch (level) {
                 default:
                     level = 1;
@@ -530,6 +532,8 @@ function startLevel() {
             }
         break;
         case 2:
+            bgmusic.src = 'assets/music/Stage2Theme.ogg';
+            bgmusic.play();
             switch (level) {
                 default:
                     level = 1;
@@ -537,6 +541,8 @@ function startLevel() {
             }
         break;
         case 3:
+            bgmusic.src = 'assets/music/Stage3Theme.ogg';
+            bgmusic.play();
             switch (level) {
                 default:
                     level = 1;
@@ -544,14 +550,14 @@ function startLevel() {
             }
         break;
         case 4:
+            bgmusic.src = 'assets/music/Stage4Theme.ogg';
+            bgmusic.play();
             switch (level) {
                 default:
                     level = 1;
                     world = 0;
             }
         break;
-        default:
-            world = 0;
     }
 
     golfhit = 0;
