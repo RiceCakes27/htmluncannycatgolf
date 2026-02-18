@@ -46,7 +46,7 @@ const rankings = [{
 }];
 
 let clickpoint, barlength, strokingIt, frameController, levelTimer;
-let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0;
+let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0, score = 0, finalbonus = 0;
 let level = 1;
 let notMoving = true;
 let globalTime = false, ableToStroke = false;
@@ -265,6 +265,9 @@ uncannydeath.addEventListener('click', () => {
 
 stageresults.addEventListener('click', () => {
     if (stageresults.querySelector('#TimeTakenR').style.visibility == 'visible') {
+        score += finalbonus;
+        document.getElementById('ScoreLabel').textContent = `Score: ${score}`;
+
         level++;
         startLevel();
     }
@@ -354,7 +357,7 @@ function update() {
             let timebonus = 6000 - 100 * (levelMins*60 + levelSecs);
             if (timebonus < 0) timebonus = 0;
 
-            let finalbonus = golfhitbonus + timebonus;// + collectiblebous;
+            finalbonus = golfhitbonus + timebonus;// + collectiblebous;
 
             let golfhitr = document.getElementById('GolfHitR');
             if (golfhit > 1) {
@@ -557,7 +560,7 @@ function startLevel() {
 
     stageresults.style = null;
     stageresults.classList = '';
-    stageresults.querySelectorAll('h1, #RankTextR').forEach((text) => {
+    stageresults.querySelectorAll('h1, #RankTextR, #RankHolder').forEach((text) => {
         text.style = null;
     });
 

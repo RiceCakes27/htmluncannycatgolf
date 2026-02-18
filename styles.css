@@ -420,3 +420,13 @@ h1, h2, h3 {
     display: flex;
     align-items: center;
 }
+
+#RankHolder {
+    width: 448px;
+    height: 352px;
+    overflow: hidden;
+    visibility: hidden;
+    left: 390px;
+    top: 365px;
+    scale: 0.8;
+}
