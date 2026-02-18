@@ -9,9 +9,12 @@ const stageresults = document.getElementById('StageResults');
 const timelabel = document.getElementById('TimeLabel');
 const leveltimelabel = document.getElementById('LevelTimeLabel');
 const golfhitlabel = document.getElementById('GolfHitLabel');
+const golfhitr = document.getElementById('GolfHitR');
 const resetlabel = document.getElementById('ResetLabel');
+const stagenamelabel = document.getElementById('StageNameLabel');
 const splashtext = document.getElementById('SplashLabel');
 const uncannydeath = document.getElementById('UncannyDeath');
+const mainmenu = document.getElementById('MainMenu');
 const levelselectmenu = document.getElementById('LevelSelect');
 const levelselectdisplay = document.getElementById('ChoiceDisplay');
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -293,8 +296,10 @@ document.getElementById('LevelButtons').addEventListener('click', (e) => {
 });
 
 document.getElementById('Confirm').addEventListener('click', () => {
-    levelselectmenu.style = null;
-    startLevelFromMenu();
+    if ((world == 0 && level <= 5) || (world >= 1 && world <= 3) || (world == 4 && level <= 11)) {
+        levelselectmenu.style = null;
+        startLevelFromMenu();
+    } else playSound('XylophoneCancel');
 });
 
 document.getElementById('StartButton').addEventListener('click', () => startLevelFromMenu());
@@ -354,12 +359,11 @@ function update() {
                 if (golfhitbonus < 0 || golfhitbonus > 5000) golfhitbonus = 0;
             }
 
-            let timebonus = 6000 - 100 * (levelMins*60 + levelSecs);
+            const timebonus = 6000 - 100 * (levelMins*60 + levelSecs);
             if (timebonus < 0) timebonus = 0;
 
             finalbonus = golfhitbonus + timebonus;// + collectiblebous;
 
-            let golfhitr = document.getElementById('GolfHitR');
             if (golfhit > 1) {
                 golfhitr.textContent = 'Golf Hit Bonus: '+golfhitbonus;
             } else {
@@ -372,8 +376,8 @@ function update() {
 
             stageresults.style.visibility = 'visible';
             stageresults.classList.add('getDownHere');
-            let results = stageresults.querySelectorAll('h1, #RankTextR');
-            let prevlevel = level;
+            const results = stageresults.querySelectorAll('h1, #RankTextR');
+            const prevlevel = level;
             for (let i = 0; i < results.length; i++) {
                 setTimeout(() => {
                     if (prevlevel == level) {
@@ -388,7 +392,7 @@ function update() {
                     if (finalbonus <= 0) {
                         //$StageResults/Rank/AnimationPlayer.play("RankUncanny")
                     } else {
-                        let rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
+                        const rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
                         //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
                         playSound(rankings[rank_number].sfx);
                     }
@@ -450,24 +454,22 @@ function startLevelFromMenu() {
     bgmusic.pause();
     playSound('HardMode');
 
-    let menu = document.getElementById('MainMenu');
-    let menuButtons = menu.querySelector('.ButtonHolder').style;
+    const menuButtons = mainmenu.querySelector('.ButtonHolder').style;
 
     menuButtons.visibility = 'hidden';
-    menu.style.backgroundColor = 'rgba(0,0,0,.8)';
-    menu.style.backgroundImage = 'url(assets/graphics/uncanny.png)';
-    menu.querySelectorAll('#Cats img').forEach(car => {
+    mainmenu.style.backgroundColor = 'rgba(0,0,0,.8)';
+    mainmenu.style.backgroundImage = 'url(assets/graphics/uncanny.png)';
+    mainmenu.querySelectorAll('#Cats img').forEach(car => {
         car.src = 'assets/graphics/uncanny.png'
     });
 
     setTimeout(() => {
-
         document.getElementById('LevelLabels').style.visibility = 'visible';
 
-        menu.style = null;
-        menu.style.visibility = 'hidden';
+        mainmenu.style = null;
+        mainmenu.style.visibility = 'hidden';
         menuButtons.visibility = null;
-        menu.querySelectorAll('#Cats img').forEach(car => {
+        mainmenu.querySelectorAll('#Cats img').forEach(car => {
             car.src = 'assets/graphics/canny.png'
         });
 
@@ -489,18 +491,31 @@ function startLevelFromMenu() {
     }, 2000);
 }
 
+function bgmusicset(audio) {
+    const src = `assets/music/${audio}.ogg`;
+    if (bgmusic.src.split('/')[5] !== src.split('/')[2]) {
+        bgmusic.src = src;
+        bgmusic.play();
+    }
+}
+
+function ontoNextWorld() {
+    //this will do the onto next world screen and such
+    level = 1;
+    world++;
+    startLevel();
+}
+
 function startLevel() {
     playSound('LevelStart2');
 
-    let stagenamelabel = document.getElementById('StageNameLabel');
     stagenamelabel.classList.add('stageLabel');
 
-    let levelbackground = document.getElementById('LevelBackground').firstElementChild;
+    const levelbackground = document.getElementById('LevelBackground').firstElementChild;
 
     switch (world) {
         case 0:
-            bgmusic.src = 'assets/music/Stage0Theme.ogg';
-            bgmusic.play();
+            bgmusicset('Stage0Theme');
             switch (level) {
                 case 1:
                     peak_value = 12000;
@@ -519,43 +534,39 @@ function startLevel() {
                     levelbackground.style.left = '-820px'
                 break;
                 default:
-                    level = 1;
+                    ontoNextWorld();
+                    return;
             }
         break;
         case 1:
-            bgmusic.src = 'assets/music/Stage1Theme.ogg';
-            bgmusic.play();
+            bgmusicset('Stage1Theme');
             switch (level) {
                 default:
-                    level = 1;
-                    world = 0;
+                    //ontoNextWorld();
+                    //return;
             }
         break;
         case 2:
-            bgmusic.src = 'assets/music/Stage2Theme.ogg';
-            bgmusic.play();
+            bgmusicset('Stage2Theme');
             switch (level) {
                 default:
-                    level = 1;
-                    world = 0;
+                    //ontoNextWorld();
+                    //return;
             }
         break;
         case 3:
-            bgmusic.src = 'assets/music/Stage3Theme.ogg';
-            bgmusic.play();
+            bgmusicset('Stage3Theme');
             switch (level) {
                 default:
-                    level = 1;
-                    world = 0;
+                    //ontoNextWorld();
+                    //return;
             }
         break;
         case 4:
-            bgmusic.src = 'assets/music/Stage4Theme.ogg';
-            bgmusic.play();
+            bgmusicset('Stage4Theme');
             switch (level) {
                 default:
-                    level = 1;
-                    world = 0;
+                    //win game
             }
         break;
     }

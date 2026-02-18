@@ -430,3 +430,7 @@ h1, h2, h3 {
     top: 365px;
     scale: 0.8;
 }
+
+#Tiles g {
+    visibility: hidden;
+}
