@@ -599,7 +599,10 @@ function startLevel() {
                     //stuff
                 break;
                 default:
-                    //win game
+                    bgmusicset('CreditsTheme');
+                    bgmusic.loop = false;
+                    document.getElementById('Ending').style.visibility = 'visible';
+                    return;
             }
         break;
     }

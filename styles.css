@@ -306,7 +306,7 @@ h1, h2, h3 {
     animation: down 1.5s;
 }
 
-#StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds {
+#StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds, #Ending {
     visibility: hidden;
 }
 #StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds div {
@@ -541,4 +541,12 @@ h1, h2, h3 {
 #OntoWorld4 #worlddescription, 
 #OntoWorld4 #clickcontinue {
     color: #b3b0ff;
+}
+
+#Ending {
+    overflow: hidden;
+}
+#Ending #Endingbg {
+    bottom: 0;
+    width: 820px;
 }
