@@ -228,7 +228,7 @@ document.addEventListener('mouseup', (click) => {
             playSound('SillyTwang2');
 
             notMoving = false;
-            applyForce((clickpoint.x-click.x)/42, (clickpoint.y-click.y)/42);
+            applyForce((clickpoint.x-click.x)/45, (clickpoint.y-click.y)/45);
             
             golfhit++;
             golfhitlabel.textContent = `Golf Hit: ${golfhit}`
@@ -296,7 +296,8 @@ document.getElementById('LevelButtons').addEventListener('click', (e) => {
 });
 
 document.getElementById('Confirm').addEventListener('click', () => {
-    if ((world == 0 && level <= 5) || (world >= 1 && world <= 3) || (world == 4 && level <= 11)) {
+    //real game world 4 goes to 11 but 6-11 dont exist so leave as 5 for now but keep seperate
+    if ((world == 0 && level <= 5) || (world >= 1 && world <= 3) || (world == 4 && level <= 5)) {
         levelselectmenu.style = null;
         startLevelFromMenu();
     } else playSound('XylophoneCancel');
@@ -306,9 +307,9 @@ document.getElementById('StartButton').addEventListener('click', () => startLeve
 
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
-const friction = 0.9965; // Friction factor for slowing down
+const friction = 0.995; // Friction factor for slowing down
 const stopThreshold = 0.5;
-const slowFactor = 0.0006;
+const slowFactor = -0.002;
 const intersectedUncannyCats = new Set();
 let onGoal = false;
 
@@ -344,7 +345,7 @@ function update() {
 
     // Check if goal
     if (isIntersecting(playerRect, goalRect)) {
-        if (!onGoal) {
+        if (!onGoal && ableToStroke) {
             playSound('Goal');
 
             addToQueue('Win');
@@ -412,6 +413,7 @@ function update() {
         if (isIntersecting(playerRect, uncanny.getBoundingClientRect())) {
             if (!intersectedUncannyCats.has(uncanny)) {
                 playSound('UncannyDeath');
+                addToQueue('Death');
 
                 speed.x = 0;
                 speed.y = 0;
@@ -432,7 +434,7 @@ function update() {
     const speedMagnitude = Math.sqrt(speed.x ** 2 + speed.y ** 2);
     
     // Apply dynamic friction: the slower the ball, the more friction applied
-    const dynamicFriction = friction + slowFactor * (1 - Math.min(speedMagnitude / 1.03, 1));
+    const dynamicFriction = friction + slowFactor * (1 - Math.min(speedMagnitude / 50, 1));
 
     // Apply friction
     speed.x *= dynamicFriction;
@@ -500,10 +502,30 @@ function bgmusicset(audio) {
 }
 
 function ontoNextWorld() {
-    //this will do the onto next world screen and such
     level = 1;
+
+    bgmusicset(`World${world}VictoryTheme`);
     world++;
-    startLevel();
+    const ontoworldscreen = document.getElementById(`OntoWorld${world}`);
+    ontoworldscreen.style.visibility = 'visible';
+    let clicks = 0, canClick = false;
+    function ontoworldclick() {
+        if (clicks == 0) {
+            ontoworldscreen.classList.add('scroll');
+            bgmusicset(`OntoWorld${world}Theme`);
+            clicks++;
+            setTimeout(() => canClick = true, 1000);
+        } else if (clicks == 1 && canClick) {
+            ontoworldscreen.style = null;
+            ontoworldscreen.classList = '';
+            ontoworldscreen.removeEventListener('click', ontoworldclick);
+            startLevel();
+        }
+    }
+    ontoworldscreen.addEventListener('click', ontoworldclick);
+    setTimeout(() => {
+        if (clicks !== 1) ontoworldclick();
+    }, 6500);
 }
 
 function startLevel() {

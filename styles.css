@@ -2,6 +2,10 @@
     font-family: COMIC;
     src: url(assets/fonts/COMIC.TTF);
 }
+@font-face {
+    font-family: GOTHIC;
+    src: url(assets/fonts/HWYGEXPD.TTF);
+}
 
 * {
     user-select: none;
@@ -159,10 +163,11 @@ h1, h2, h3 {
 #StageNameLabelParent {
     top: 220px;
     left: 25px;
-    width: 350px;
+    width: 1205px;
     height: 90px;
     display: flex;
     align-items: center;
+    overflow: hidden;
 }
 #StageNameLabel {
     margin: 0;
@@ -301,8 +306,10 @@ h1, h2, h3 {
     animation: down 1.5s;
 }
 
-#StageResults, #UncannyDeath, #LevelSelect {
+#StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds {
     visibility: hidden;
+}
+#StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds div {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -433,4 +440,105 @@ h1, h2, h3 {
 
 #Tiles g {
     visibility: hidden;
+}
+
+#OntoWorlds {
+    overflow: hidden;
+    visibility: hidden;
+}
+#OntoWorlds div {
+    background-image: url(assets/graphics/ontotexture.png);
+    width: 820px;
+    height: 1640px;
+    top: 0;
+}
+#OntoWorlds .scroll {
+    top: -820px;
+    transition: all 0.4s ease-out;
+}
+
+#OntoWorlds > div * {
+    width: 580px;
+    left: 120px;
+    text-align: center;
+}
+#OntoWorlds #worldcompleted {
+    top: 30px;
+}
+#OntoWorlds #completed {
+    top: 100px;
+}
+#OntoWorlds #completed2 {
+    background-image: url(assets/graphics/completedpicture.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 290px;
+    top: 350px;
+}
+#OntoWorlds #congratulations {
+    top: 650px;
+}
+
+#OntoWorlds #sign, #OntoWorlds #gradient {
+    top: 820px;
+    width: 820px;
+    left: 0;
+}
+#nextexit, #worldname, #worlddescription, #clickcontinue {
+    font-family: GOTHIC !important;
+    position: absolute;
+}
+#nextexit {
+    font-size: xx-large;
+}
+#worldname {
+    font-size: 40px;
+}
+#OntoWorlds #nextexit {
+    top: 1050px
+}
+#OntoWorlds #worldname {
+    top: 1095px
+}
+#OntoWorlds #worlddescription {
+    top: 1160px
+}
+#OntoWorlds #clickcontinue {
+    top: 1215px
+}
+
+#OntoWorld2 {
+    background-color: #ff87ff;
+    background-blend-mode: multiply;
+}
+/*i dont know how to color the sign*/
+#OntoWorld2 #nextexit, 
+#OntoWorld2 #worldname, 
+#OntoWorld2 #worlddescription, 
+#OntoWorld2 #clickcontinue {
+    color: #ffbeff;
+}
+
+#OntoWorld3 {
+    background-color: #00ffff;
+    background-blend-mode: multiply;
+}
+/*i still dont know how to color the sign*/
+#OntoWorld3 #nextexit, 
+#OntoWorld3 #worldname, 
+#OntoWorld3 #worlddescription, 
+#OntoWorld3 #clickcontinue {
+    color: #ffff79;
+}
+
+#OntoWorld4 {
+    background-color: #808cff;
+    background-blend-mode: multiply;
+}
+/*i still still dont know how to color the sign*/
+#OntoWorld4 #nextexit, 
+#OntoWorld4 #worldname, 
+#OntoWorld4 #worlddescription, 
+#OntoWorld4 #clickcontinue {
+    color: #b3b0ff;
 }
