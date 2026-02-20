@@ -561,3 +561,22 @@ h1, h2, h3 {
     left: 90px;
     top: 90px;
 }
+
+#PauseMenu {
+    background-color: #00000046;
+    visibility: hidden;
+}
+#PauseMenu .ButtonHolder {
+    width: 250px;
+    left: 20px;
+    top: 100px;
+}
+#PauseAnimHolder {
+    width: 820px;
+    height: 820px;
+    overflow: hidden;
+}
+#PauseAnimHolder img {
+    height: 820px;
+    width: 3280px;
+}

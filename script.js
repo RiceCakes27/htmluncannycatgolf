@@ -18,6 +18,7 @@ const splashtext = document.getElementById('SplashLabel');
 const uncannydeath = document.getElementById('UncannyDeath');
 const mainmenu = document.getElementById('MainMenu');
 const levelselectmenu = document.getElementById('LevelSelect');
+const pausemenu = document.getElementById('PauseMenu');
 const levelselectdisplay = document.getElementById('ChoiceDisplay');
 const ending = document.getElementById('Ending');
 const endingbg = document.getElementById('Endingbg');
@@ -56,7 +57,7 @@ let clickpoint, barlength, strokingIt, frameController, levelTimer, totalTimer;
 let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0, score = 0, finalbonus = 0;
 let level = 1;
 let notMoving = true;
-let globalTime = false, ableToStroke = false;
+let globalTime = false, ableToStroke = false, paused = false;
 let thoughtsQueue = "";
 let peak_value = 12000;
 
@@ -148,7 +149,7 @@ async function think(thought) {
     onThoughtsAnimationFinished();
 }
 
-function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = false) {
+function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = false, speed = 83.33) {
     return new Promise(resolve => {
         let currentFrame = 0;
         image.style.top = 0;
@@ -178,9 +179,9 @@ function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = fals
             nextFrame();
             if (tv) {
                 clearInterval(frameController);
-                frameController = setInterval(nextFrame, 83.33);
+                frameController = setInterval(nextFrame, speed);
             } else {
-                setInterval(nextFrame, 83.33);
+                setInterval(nextFrame, speed);
             }
         }
     });
@@ -245,6 +246,22 @@ document.addEventListener('mouseup', (click) => {
     }
 });
 
+function resetErything() {
+    paused = false;
+    mainmenu.style.visibility = 'visible';
+    pausemenu.style = null;
+    levellabels.style = null;
+    bgmusic.loop = true;
+    bgmusicset('TitleTheme');
+    ending.style = null;
+    endingbg.classList = '';
+    world = 0, level = 1;
+    timelabel.textContent = 'Total Time: 00:00';
+    scoreLabel.textContent = 'Score: 0';
+    resetlabel.textContent = 'Resets: 0';
+    clearInterval(totalTimer);
+}
+
 //startup stuff
 setTimeout(() => {
     think('Static');
@@ -253,7 +270,7 @@ document.querySelectorAll('#FlagHolder').forEach(element => {
     let frameWidth = 150;
     let frameHeight = 200;
     let image = element.firstElementChild;
-    let frames = (image.width/frameWidth)*(image.height/frameHeight)-1
+    let frames = (image.width/frameWidth)*(image.height/frameHeight)-1;
     spriteAnim(image, frames, frameWidth, frameHeight);
 });
 
@@ -320,21 +337,38 @@ document.getElementById('StartButton').addEventListener('click', () => startLeve
 
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
-        if (globalTime) {
-            //pause
-        } else {
-            mainmenu.style.visibility = 'visible';
-            bgmusic.loop = true;
-            bgmusicset('TitleTheme');
-            ending.style = null;
-            endingbg.classList = '';
-            world = 0, level = 1;
-            timelabel.textContent = 'Total Time: 00:00';
-            scoreLabel.textContent = 'Score: 0';
-            resetlabel.textContent = 'Resets: 0';
+        if (globalTime && ableToStroke || !globalTime && paused) {
+            if (!paused) {
+                paused = true;
+                globalTime = false;
+                pausemenu.style.visibility = 'visible';
+                //sounds domonic but i ont got a way to pitch shift
+                bgmusic.playbackRate = 0.75;
+            }
+        } else if (ending.style.visibility == 'visible') {
+            resetErything();
         }
     }
 });
+
+document.getElementById('ResumeButton').addEventListener('click', () => {
+    paused = false;
+    globalTime = true;
+    pausemenu.style = null;
+    bgmusic.playbackRate = 1;
+    requestAnimationFrame(update);
+});
+document.getElementById('MenuButton').addEventListener('click', () => {
+    resetErything();
+    requestAnimationFrame(update);
+});
+
+//pause anim
+let image = document.getElementById('PauseAnim');
+let frameWidth = 820;
+let frameHeight = 820;
+let frames = (image.width/frameWidth)*(image.height/frameHeight);
+spriteAnim(image, frames, frameWidth, frameHeight, 1, false, 200);
 
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
@@ -446,6 +480,8 @@ function update() {
                 playSound('UncannyDeath');
                 addToQueue('Death');
 
+                ableToStroke = false;
+
                 speed.x = 0;
                 speed.y = 0;
 
@@ -479,7 +515,7 @@ function update() {
         speed.y = 0;
     }
 
-    requestAnimationFrame(update); // Loop to continuously update
+    if (!paused) requestAnimationFrame(update); // Loop to continuously update
 }
 // Start the movement
 update();
@@ -511,12 +547,14 @@ function startLevelFromMenu() {
 
         let min = 0, sec = 0;
         totalTimer = setInterval(() => {
-            sec++;
-            if (sec === 60) {
-                min++;
-                sec = 0;
+            if (!paused) {
+                sec++;
+                if (sec === 60) {
+                    min++;
+                    sec = 0;
+                }
+                timelabel.textContent = `Total Time: ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
             }
-            timelabel.textContent = `Total Time: ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }, 1000);
 
         startLevel();
@@ -668,12 +706,14 @@ function startLevel() {
         ableToStroke = true;
 
         levelTimer = setInterval(() => {
-            levelSecs++;
-            if (levelSecs === 60) {
-                levelMins++;
-                levelSecs = 0;
+            if (!paused) {
+                levelSecs++;
+                if (levelSecs === 60) {
+                    levelMins++;
+                    levelSecs = 0;
+                }
+                leveltimelabel.textContent = `Time: ${String(levelMins).padStart(2, '0')}:${String(levelSecs).padStart(2, '0')}`;
             }
-            leveltimelabel.textContent = `Time: ${String(levelMins).padStart(2, '0')}:${String(levelSecs).padStart(2, '0')}`;
         }, 1000);
     }, 1000);
 }
