@@ -57,7 +57,7 @@ let clickpoint, barlength, strokingIt, frameController, levelTimer, totalTimer;
 let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0, score = 0, finalbonus = 0;
 let level = 1;
 let notMoving = true;
-let globalTime = false, ableToStroke = false, paused = false;
+let globalTime = false, ableToStroke = false, paused = false, walls = false;
 let thoughtsQueue = "";
 let peak_value = 12000;
 
@@ -253,6 +253,62 @@ document.addEventListener('pointerup', (click) => {
     }
 });
 
+function svg2walls(svg) {
+    let path = svg.querySelector('path').getAttribute('d').split(' ');
+    let dindex = 0;
+    let current = {x: 0, y: 0};
+    let walls = [];
+    let linebegin;
+    function handleCommand() {
+        let cords;
+        switch (path[dindex]) {
+            case 'M':
+                cords = path[dindex+1].split(',');
+                current = {x: +cords[0], y: +cords[1]};
+            return true;
+            case 'V':
+                walls.push({from: [current.x, current.y], to: [current.x, path[dindex+1]]});
+                current.y = +path[dindex+1];
+            return true;
+            case 'H':
+                walls.push({from: [current.x, current.y], to: [path[dindex+1], current.y]});
+                current.x = +path[dindex+1];
+            return true;
+            case 'v':
+                walls.push({from: [current.x, current.y], to: [current.x, current.y+ +path[dindex+1]]});
+                current.y = walls[walls.length-1].to[1];
+            return true;
+            case 'h':
+                walls.push({from: [current.x, current.y], to: [current.x+ +path[dindex+1], current.y]});
+                current.x = walls[walls.length-1].to[0];
+            return true;
+            case 'Z':
+                walls.push({from: [current.x, current.y], to: [walls[0].from[0], walls[0].from[1]]});
+                current = {x: walls[0].from[0], y: walls[0].from[1]};
+                linebegin = walls.length;
+                dindex -= 1;
+            return true;
+            case 'm':
+                cords = path[dindex+1].split(',');
+                current = {x: current.x+ +cords[0], y: current.y+ +cords[1]};
+            return true;
+            case 'z':
+                walls.push({from: [current.x, current.y], to: [walls[linebegin].from[0], walls[linebegin].from[1]]});
+                dindex -= 1;
+            return true;
+            default:
+                return false;
+        }
+    }
+
+    while (dindex < path.length) {
+        if (!handleCommand()) break;
+        dindex += 2;
+    }
+
+    return walls;
+}
+
 function resetErything() {
     paused = false;
     mainmenu.style.visibility = 'visible';
@@ -398,21 +454,48 @@ function applyForce(forceX, forceY) {
 }
 
 function update() {
-    const playerRect = player.getBoundingClientRect();
-    const containerRect = gamewindow.getBoundingClientRect();
     const goalRect = goal.querySelector('#Hole').getBoundingClientRect();
     const leftOffset = document.getElementById('HUD').getBoundingClientRect().width;
 
+    const playerRect = player.getBoundingClientRect();
+    const playerLeft = playerRect.left;
+    const playerRight = playerRect.right;
+    const playerTop = playerRect.top;
+    const playerBottom = playerRect.bottom;
+    const playerWidth = playerRect.width;
+    const playerHeight = playerRect.height;
+
+    const containerRect = gamewindow.getBoundingClientRect();
+    const containerLeft = containerRect.left;
+    const containerRight = containerRect.right;
+    const containerTop = containerRect.top;
+    const containerBottom = containerRect.bottom;
+
     // Check for wall collisions
-    if (playerRect.left < containerRect.left || playerRect.right > containerRect.right) {
-        speed.x *= -1; // Reverse x direction on collision
-        player.style.left = Math.max(containerRect.left-leftOffset, Math.min(playerRect.left-leftOffset + speed.x, containerRect.right - playerRect.width)) + 'px'; // Clamp position
-        playSound('WallBump2');
-    }
-    if (playerRect.top < containerRect.top || playerRect.bottom > containerRect.bottom) {
-        speed.y *= -1; // Reverse y direction on collision
-        player.style.top = Math.max(containerRect.top, Math.min(playerRect.top + speed.y, containerRect.bottom - playerRect.height)) + 'px'; // Clamp position
-        playSound('WallBump2');
+    if (walls) {
+        walls.forEach(wall => {
+            if (wall.from[0] == wall.to[0]) {
+                console.log(playerRect, {right: wall.to[0], left: wall.from[0], bottom: wall.to[1], top: wall.from[1]})
+                if (isIntersecting(playerRect, {right: wall.to[0], left: wall.from[0], bottom: wall.to[1], top: wall.from[1]})) {
+                    speed.x *= -1; // Reverse x direction on collision
+                    player.style.left = Math.max(wall.from[1]-leftOffset, Math.min(playerLeft-leftOffset + speed.x, wall.to[1] - playerWidth)) + 'px'; // Clamp position
+                    playSound('WallBump2');
+                }
+            } else if (wall.from[1] == wall.to[1]) {
+                //vertical
+            }
+        });
+    } else {
+        if (playerLeft <= containerLeft || playerRight >= containerRight) {
+            speed.x *= -1; // Reverse x direction on collision
+            player.style.left = Math.max(containerLeft-leftOffset, Math.min(playerLeft-leftOffset + speed.x, containerRight - playerWidth)) + 'px'; // Clamp position
+            playSound('WallBump2');
+        }
+        if (playerTop <= containerTop || playerBottom >= containerBottom) {
+            speed.y *= -1; // Reverse y direction on collision
+            player.style.top = Math.max(containerTop, Math.min(playerTop + speed.y, containerBottom - playerHeight)) + 'px'; // Clamp position
+            playSound('WallBump2');
+        }
     }
 
     // Check if goal
@@ -502,8 +585,9 @@ function update() {
     });
 
 
-    player.style.left = playerRect.left-leftOffset + speed.x + window.pageXOffset + 'px';
-    player.style.top = playerRect.top + speed.y + window.pageYOffset + 'px';
+    // Movement
+    player.style.left = playerLeft-leftOffset + speed.x + window.pageXOffset + 'px';
+    player.style.top = playerTop + speed.y + window.pageYOffset + 'px';
 
     const speedMagnitude = Math.sqrt(speed.x ** 2 + speed.y ** 2);
     
@@ -619,6 +703,7 @@ function startLevel() {
                     //also reset uncanny
                     stagenamelabel.textContent = '0-1: Welcome to Uncanny Cat Golf!';
                     levelbackground.style = null;
+                    walls = false;
                 break;
                 case 2:
                     peak_value = 10000;
@@ -630,7 +715,10 @@ function startLevel() {
                     levelbackground.style.left = '-820px';
                     
                     //testing below
-                    //document.getElementById('Tiles').querySelector('#w1l2').style.visibility = 'visible';
+                    //const tiles = document.getElementById('w0l2');
+                    //tiles.style.visibility = 'visible';
+                    //walls = svg2walls(tiles);
+                    //make gooder
                 break;
                 default:
                     ontoNextWorld();
