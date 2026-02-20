@@ -618,6 +618,7 @@ function startLevel() {
                     goal.style = null;
                     //also reset uncanny
                     stagenamelabel.textContent = '0-1: Welcome to Uncanny Cat Golf!';
+                    levelbackground.style = null;
                 break;
                 case 2:
                     peak_value = 10000;
