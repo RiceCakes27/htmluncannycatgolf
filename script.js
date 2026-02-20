@@ -267,11 +267,11 @@ function svg2walls(svg) {
                 current = {x: +cords[0], y: +cords[1]};
             return true;
             case 'V':
-                walls.push({from: [current.x, current.y], to: [current.x, path[dindex+1]]});
+                walls.push({from: [current.x, current.y], to: [current.x, +path[dindex+1]]});
                 current.y = +path[dindex+1];
             return true;
             case 'H':
-                walls.push({from: [current.x, current.y], to: [path[dindex+1], current.y]});
+                walls.push({from: [current.x, current.y], to: [+path[dindex+1], current.y]});
                 current.x = +path[dindex+1];
             return true;
             case 'v':
@@ -455,34 +455,35 @@ function applyForce(forceX, forceY) {
 
 function update() {
     const goalRect = goal.querySelector('#Hole').getBoundingClientRect();
-    const leftOffset = document.getElementById('HUD').getBoundingClientRect().width;
+    const leftOffset = gamewindow.offsetLeft;
 
     const playerRect = player.getBoundingClientRect();
-    const playerLeft = playerRect.left;
+    const playerLeft = player.offsetLeft;
     const playerRight = playerRect.right;
-    const playerTop = playerRect.top;
+    const playerTop = player.offsetTop;
     const playerBottom = playerRect.bottom;
     const playerWidth = playerRect.width;
     const playerHeight = playerRect.height;
 
     const containerRect = gamewindow.getBoundingClientRect();
-    const containerLeft = containerRect.left;
+    const containerLeft = gamewindow.offsetLeft;
     const containerRight = containerRect.right;
-    const containerTop = containerRect.top;
+    const containerTop = gamewindow.offsetTop;
     const containerBottom = containerRect.bottom;
 
     // Check for wall collisions
     if (walls) {
         walls.forEach(wall => {
             if (wall.from[0] == wall.to[0]) {
-                console.log(playerRect, {right: wall.to[0], left: wall.from[0], bottom: wall.to[1], top: wall.from[1]})
-                if (isIntersecting(playerRect, {right: wall.to[0], left: wall.from[0], bottom: wall.to[1], top: wall.from[1]})) {
+                //vertical
+                //console.log(playerRect, {left: Math.min(wall.from[0], wall.to[0]), right: Math.max(wall.from[0], wall.to[0]), top: Math.min(wall.from[1], wall.to[1]), bottom: Math.max(wall.from[1], wall.to[1])})
+                if (isIntersecting(playerRect, {left: Math.min(wall.from[0], wall.to[0]), right: Math.max(wall.from[0], wall.to[0]), top: Math.min(wall.from[1], wall.to[1]), bottom: Math.max(wall.from[1], wall.to[1])})) {
                     speed.x *= -1; // Reverse x direction on collision
                     player.style.left = Math.max(wall.from[1]-leftOffset, Math.min(playerLeft-leftOffset + speed.x, wall.to[1] - playerWidth)) + 'px'; // Clamp position
                     playSound('WallBump2');
                 }
             } else if (wall.from[1] == wall.to[1]) {
-                //vertical
+                //horizontal
             }
         });
     } else {
