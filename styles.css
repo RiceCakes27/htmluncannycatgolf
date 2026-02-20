@@ -545,8 +545,19 @@ h1, h2, h3 {
 
 #Ending {
     overflow: hidden;
+    background-color: black;
 }
 #Ending #Endingbg {
     bottom: 0;
     width: 820px;
+}
+.credits {
+    transform: translateY(100%);
+    transition: transform 125s linear 7.38s;
+}
+#GameOver {
+    font-family: COMIC;
+    white-space: pre-line;
+    left: 90px;
+    top: 90px;
 }

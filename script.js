@@ -6,6 +6,8 @@ const bgmusic = document.getElementById('bgmusic');
 const goal = document.getElementById('GoalHole');
 const thoughts = document.getElementById('Thoughts').querySelector('img');
 const stageresults = document.getElementById('StageResults');
+const levellabels = document.getElementById('LevelLabels');
+const scoreLabel = document.getElementById('ScoreLabel');
 const timelabel = document.getElementById('TimeLabel');
 const leveltimelabel = document.getElementById('LevelTimeLabel');
 const golfhitlabel = document.getElementById('GolfHitLabel');
@@ -17,6 +19,8 @@ const uncannydeath = document.getElementById('UncannyDeath');
 const mainmenu = document.getElementById('MainMenu');
 const levelselectmenu = document.getElementById('LevelSelect');
 const levelselectdisplay = document.getElementById('ChoiceDisplay');
+const ending = document.getElementById('Ending');
+const endingbg = document.getElementById('Endingbg');
 const delay = ms => new Promise(res => setTimeout(res, ms));
 const splash = [
 	"honestly quite incredible",
@@ -48,7 +52,7 @@ const rankings = [{
         sfx: "XylophoneCancel"
 }];
 
-let clickpoint, barlength, strokingIt, frameController, levelTimer;
+let clickpoint, barlength, strokingIt, frameController, levelTimer, totalTimer;
 let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0, score = 0, finalbonus = 0;
 let level = 1;
 let notMoving = true;
@@ -269,14 +273,23 @@ uncannydeath.addEventListener('click', () => {
 stageresults.addEventListener('click', () => {
     if (stageresults.querySelector('#TimeTakenR').style.visibility == 'visible') {
         score += finalbonus;
-        document.getElementById('ScoreLabel').textContent = `Score: ${score}`;
+        scoreLabel.textContent = `Score: ${score}`;
 
         level++;
         startLevel();
+
+        stageresults.style = null;
+        stageresults.classList = '';
+        stageresults.querySelectorAll('h1, #RankTextR, #RankHolder').forEach((text) => {
+            text.style = null;
+        });
     }
 });
 
-document.getElementById('LevelSelectButton').addEventListener('click', () => levelselectmenu.style.visibility = 'visible');
+document.getElementById('LevelSelectButton').addEventListener('click', () => {
+    levelselectdisplay.textContent = `0-1`;
+    levelselectmenu.style.visibility = 'visible';
+});
 
 function updateLevelDisplay(type, button) {
     const value = button.firstElementChild.textContent;
@@ -304,6 +317,24 @@ document.getElementById('Confirm').addEventListener('click', () => {
 });
 
 document.getElementById('StartButton').addEventListener('click', () => startLevelFromMenu());
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        if (globalTime) {
+            //pause
+        } else {
+            mainmenu.style.visibility = 'visible';
+            bgmusic.loop = true;
+            bgmusicset('TitleTheme');
+            ending.style = null;
+            endingbg.classList = '';
+            world = 0, level = 1;
+            timelabel.textContent = 'Total Time: 00:00';
+            scoreLabel.textContent = 'Score: 0';
+            resetlabel.textContent = 'Resets: 0';
+        }
+    }
+});
 
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
@@ -466,8 +497,6 @@ function startLevelFromMenu() {
     });
 
     setTimeout(() => {
-        document.getElementById('LevelLabels').style.visibility = 'visible';
-
         mainmenu.style = null;
         mainmenu.style.visibility = 'hidden';
         menuButtons.visibility = null;
@@ -480,7 +509,7 @@ function startLevelFromMenu() {
         globalTime = true;
 
         let min = 0, sec = 0;
-        setInterval(() => {
+        totalTimer = setInterval(() => {
             sec++;
             if (sec === 60) {
                 min++;
@@ -503,6 +532,8 @@ function bgmusicset(audio) {
 
 function ontoNextWorld() {
     level = 1;
+
+    levellabels.style.visibility = 'hidden';
 
     bgmusicset(`World${world}VictoryTheme`);
     world++;
@@ -601,7 +632,11 @@ function startLevel() {
                 default:
                     bgmusicset('CreditsTheme');
                     bgmusic.loop = false;
-                    document.getElementById('Ending').style.visibility = 'visible';
+                    levellabels.style.visibility = 'hidden';
+                    clearInterval(totalTimer);
+                    globalTime = false;
+                    ending.style.visibility = 'visible';
+                    endingbg.classList.add('credits');
                     return;
             }
         break;
@@ -609,17 +644,12 @@ function startLevel() {
 
     playSound('LevelStart2');
 
+    levellabels.style.visibility = 'visible';
     stagenamelabel.classList.add('stageLabel');
 
     golfhit = 0;
     golfhitlabel.textContent = 'Golf Hit: 0';
     leveltimelabel.textContent = 'Time: 00:00';
-
-    stageresults.style = null;
-    stageresults.classList = '';
-    stageresults.querySelectorAll('h1, #RankTextR, #RankHolder').forEach((text) => {
-        text.style = null;
-    });
 
     player.classList.add('grow');
 
