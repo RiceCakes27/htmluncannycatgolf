@@ -458,17 +458,17 @@ function update() {
     const leftOffset = gamewindow.offsetLeft;
 
     const playerRect = player.getBoundingClientRect();
-    const playerLeft = player.offsetLeft;
+    const playerLeft = playerRect.left;
     const playerRight = playerRect.right;
-    const playerTop = player.offsetTop;
+    const playerTop = playerRect.top;
     const playerBottom = playerRect.bottom;
     const playerWidth = playerRect.width;
     const playerHeight = playerRect.height;
 
     const containerRect = gamewindow.getBoundingClientRect();
-    const containerLeft = gamewindow.offsetLeft;
+    const containerLeft = containerRect.left;
     const containerRight = containerRect.right;
-    const containerTop = gamewindow.offsetTop;
+    const containerTop = containerRect.top;
     const containerBottom = containerRect.bottom;
 
     // Check for wall collisions
@@ -609,7 +609,7 @@ function update() {
 
     if (!paused) requestAnimationFrame(update); // Loop to continuously update
 }
-// Start the movement
+// Start physics
 update();
 
 function startLevelFromMenu() {
