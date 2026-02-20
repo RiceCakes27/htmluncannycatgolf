@@ -377,6 +377,15 @@ let frameHeight = 820;
 let frames = (image.width/frameWidth)*(image.height/frameHeight);
 spriteAnim(image, frames, frameWidth, frameHeight, 1, false, 200);
 
+function resize() {
+    const scaleX = window.innerWidth / 1230;
+    const scaleY = window.innerHeight / 820;
+    const scale = Math.min(scaleX, scaleY); // contain behavior
+    document.getElementById('container').style.setProperty('--scale', scale);
+}
+window.addEventListener('resize', resize);
+resize();
+
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
 const friction = 0.995; // Friction factor for slowing down
@@ -401,17 +410,17 @@ function update() {
     const playerRect = player.getBoundingClientRect();
     const containerRect = gamewindow.getBoundingClientRect();
     const goalRect = goal.querySelector('#Hole').getBoundingClientRect();
-    const leftOffset = document.getElementById('HUD').getBoundingClientRect().width;
+    const leftOffset = gamewindow.offsetLeft;
 
     // Check for wall collisions
-    if (playerRect.left < containerRect.left || playerRect.right > containerRect.right) {
+    if (player.offsetLeft < gamewindow.offsetLeft || playerRect.right > containerRect.right) {
         speed.x *= -1; // Reverse x direction on collision
-        player.style.left = Math.max(containerRect.left-leftOffset, Math.min(playerRect.left-leftOffset + speed.x, containerRect.right - playerRect.width)) + 'px'; // Clamp position
+        player.style.left = Math.max(gamewindow.offsetLeft-leftOffset, Math.min(player.offsetLeft-leftOffset + speed.x, containerRect.right - playerRect.width)) + 'px'; // Clamp position
         playSound('WallBump2');
     }
-    if (playerRect.top < containerRect.top || playerRect.bottom > containerRect.bottom) {
+    if (player.offsetTop < gamewindow.offsetTop || playerRect.bottom > containerRect.bottom) {
         speed.y *= -1; // Reverse y direction on collision
-        player.style.top = Math.max(containerRect.top, Math.min(playerRect.top + speed.y, containerRect.bottom - playerRect.height)) + 'px'; // Clamp position
+        player.style.top = Math.max(gamewindow.offsetTop, Math.min(player.offsetTop + speed.y, containerRect.bottom - playerRect.height)) + 'px'; // Clamp position
         playSound('WallBump2');
     }
 
@@ -501,9 +510,8 @@ function update() {
         }
     });
 
-
-    player.style.left = playerRect.left-leftOffset + speed.x + window.pageXOffset + 'px';
-    player.style.top = playerRect.top + speed.y + window.pageYOffset + 'px';
+    player.style.left = player.offsetLeft-leftOffset + speed.x + window.pageXOffset + 'px';
+    player.style.top = player.offsetTop + speed.y + window.pageYOffset + 'px';
 
     const speedMagnitude = Math.sqrt(speed.x ** 2 + speed.y ** 2);
     
@@ -524,7 +532,7 @@ function update() {
 
     if (!paused) requestAnimationFrame(update); // Loop to continuously update
 }
-// Start the movement
+// Start physics
 update();
 
 function startLevelFromMenu() {

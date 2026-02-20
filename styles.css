@@ -16,6 +16,10 @@ body {
     margin: 0;
     display: flex;
     cursor: url('assets/graphics/mouse.png'), auto;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
 }
 
 img {
@@ -581,4 +585,12 @@ h1, h2, h3 {
 #PauseAnimHolder img {
     height: 820px;
     width: 3280px;
+}
+
+#container {
+    width: 1230px;
+    height: 820px;
+    transform-origin: center;
+    display: flex;
+    transform: scale(var(--scale));
 }
