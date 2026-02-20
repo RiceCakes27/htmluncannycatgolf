@@ -187,6 +187,11 @@ function spriteAnim(image, frames, frameWidth, frameHeight, scale = 1, tv = fals
     });
 }
 
+const onTouchMove = (e) => {
+    e.preventDefault();
+    mousemove({x: e.touches[0].clientX, y: e.touches[0].clientY});
+};
+
 function mousemove(cursor) {
     barlength = Math.min(Math.hypot(cursor.x - clickpoint.x, cursor.y - clickpoint.y), 300);
 
@@ -202,7 +207,7 @@ function mousemove(cursor) {
     }
 }
 
-gamewindow.addEventListener('mousedown', (click) => {
+gamewindow.addEventListener('pointerdown', (click) => {
     if (notMoving && ableToStroke) {
         clickpoint = click;
         strokingIt = true;
@@ -218,16 +223,18 @@ gamewindow.addEventListener('mousedown', (click) => {
         powerbar.style.visibility = 'visible';
         
         document.addEventListener('mousemove', mousemove);
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
     }
 });
 
-document.addEventListener('mouseup', (click) => {
+document.addEventListener('pointerup', (click) => {
     if (strokingIt) {
         clickmarker.style.visibility = 'hidden';
 
         powerbar.style.visibility = 'hidden';
 
         document.removeEventListener('mousemove', mousemove);
+        document.removeEventListener('touchmove', onTouchMove);
 
         if (barlength > 32) {
             playSound('SillyTwang2');
