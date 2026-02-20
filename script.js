@@ -517,7 +517,7 @@ function update() {
     // Check if the player is stopped
     if (speedMagnitude < stopThreshold && !notMoving) {
         notMoving = true;
-        playSound('PickUpNotif');
+        if (ableToStroke) playSound('PickUpNotif');
         speed.x = 0;
         speed.y = 0;
     }
