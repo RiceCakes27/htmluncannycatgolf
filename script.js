@@ -391,7 +391,7 @@ function update() {
                 if (golfhitbonus < 0 || golfhitbonus > 5000) golfhitbonus = 0;
             }
 
-            const timebonus = 6000 - 100 * (levelMins*60 + levelSecs);
+            let timebonus = 6000 - 100 * (levelMins*60 + levelSecs);
             if (timebonus < 0) timebonus = 0;
 
             finalbonus = golfhitbonus + timebonus;// + collectiblebous;
@@ -472,8 +472,9 @@ function update() {
     speed.y *= dynamicFriction;
 
     // Check if the player is stopped
-    if (speedMagnitude < stopThreshold) {
+    if (speedMagnitude < stopThreshold && !notMoving) {
         notMoving = true;
+        playSound('PickUpNotif');
         speed.x = 0;
         speed.y = 0;
     }
