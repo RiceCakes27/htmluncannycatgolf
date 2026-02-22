@@ -212,15 +212,14 @@ h1, h2, h3 {
     position: relative;
 }
 
-#FlagHolder {
-    overflow: hidden;
+#Flag {
     left: 5px;
     height: 200px;
     width: 150px;
-}
-#FlagHolder img {
-    height: 200px;
-    width: 600px;
+    background-image: url(assets/graphics/goalflag.png);
+    background-size: 600px;
+    --xPosEnd: -450px;
+    animation: walk-x 0.3s steps(3) infinite;
 }
 
 #Hole {
@@ -579,9 +578,7 @@ h1, h2, h3 {
 #PauseAnim {
     width: 820px;
     height: 820px;
-    overflow: hidden;
-    animation: 
-        walk-x 0.8s steps(3) infinite;
+    animation: walk-x 0.8s steps(3) infinite;
     background-image: url(assets/graphics/pausegraphic.png);
     --xPosEnd: -2460px;
     background-size: 3280px;
@@ -610,6 +607,5 @@ h1, h2, h3 {
 
 #WinConfetti {
     background-image: url(assets/graphics/winconfetti.png);
-    background-repeat: no-repeat;
     background-size: 9840px;
 }

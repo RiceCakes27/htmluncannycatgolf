@@ -326,13 +326,6 @@ function resetErything() {
 setTimeout(() => {
     think('Static');
 }, 100);
-document.querySelectorAll('#FlagHolder').forEach(element => {
-    let frameWidth = 150;
-    let frameHeight = 200;
-    let image = element.firstElementChild;
-    let frames = (image.width/frameWidth)*(image.height/frameHeight)-1;
-    spriteAnim(image, frames, frameWidth, frameHeight);
-});
 
 bgmusic.volume = 0.2;
 
