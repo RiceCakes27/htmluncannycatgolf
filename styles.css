@@ -576,19 +576,20 @@ h1, h2, h3 {
     left: 20px;
     top: 100px;
 }
-#PauseAnimHolder {
+#PauseAnim {
     width: 820px;
     height: 820px;
     overflow: hidden;
-}
-#PauseAnimHolder img {
-    height: 820px;
-    width: 3280px;
+    animation: 
+        walk-x 0.8s steps(3) infinite;
+    background-image: url(assets/graphics/pausegraphic.png);
+    --xPosEnd: -2460px;
+    background-size: 3280px;
 }
 
 @keyframes walk-x {
     from {background-position-x: 0;}
-    to {background-position-x: -9020px;}
+    to {background-position-x: var(--xPosEnd);}
 }
 
 @keyframes walk-y {
@@ -604,6 +605,7 @@ h1, h2, h3 {
         walk-x 0.8s steps(11) infinite,
         walk-y 3.2s steps(1, end) infinite;
     visibility: visible !important;
+    --xPosEnd: -9020px;
 }
 
 #WinConfetti {

@@ -404,7 +404,7 @@ document.addEventListener('keydown', event => {
                 paused = true;
                 globalTime = false;
                 pausemenu.style.visibility = 'visible';
-                //sounds domonic but i ont got a way to pitch shift
+                //sounds demonic but i ont got a way to pitch shift
                 bgmusic.playbackRate = 0.75;
             }
         } else if (ending.style.visibility == 'visible') {
@@ -424,13 +424,6 @@ document.getElementById('MenuButton').addEventListener('click', () => {
     resetErything();
     requestAnimationFrame(update);
 });
-
-//pause anim
-let image = document.getElementById('PauseAnim');
-let frameWidth = 820;
-let frameHeight = 820;
-let frames = (image.width/frameWidth)*(image.height/frameHeight);
-spriteAnim(image, frames, frameWidth, frameHeight, 1, false, 200);
 
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
