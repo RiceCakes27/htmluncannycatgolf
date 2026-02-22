@@ -22,7 +22,8 @@ const pausemenu = document.getElementById('PauseMenu');
 const levelselectdisplay = document.getElementById('ChoiceDisplay');
 const ending = document.getElementById('Ending');
 const endingbg = document.getElementById('Endingbg');
-const confetti = document.getElementById('WinConfetti')
+const confetti = document.getElementById('WinConfetti');
+const rank = document.getElementById('Rank');
 const delay = ms => new Promise(res => setTimeout(res, ms));
 const splash = [
 	"honestly quite incredible",
@@ -583,12 +584,13 @@ function update() {
             }
             setTimeout(() => {
                 if (prevlevel == level) {
-                    document.getElementById('RankHolder').style.visibility = 'visible';
+                    rank.style.visibility = 'visible';
                     if (finalbonus <= 0) {
                         //$StageResults/Rank/AnimationPlayer.play("RankUncanny")
                     } else {
                         const rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
                         //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
+                        rank.classList.add('play');
                         playSound(rankings[rank_number].sfx);
                     }
                 }

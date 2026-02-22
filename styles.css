@@ -429,14 +429,22 @@ h1, h2, h3 {
     align-items: center;
 }
 
-#RankHolder {
+#Rank {
     width: 448px;
     height: 352px;
-    overflow: hidden;
     visibility: hidden;
     left: 390px;
     top: 365px;
     scale: 0.8;
+    background-image: url(assets/graphics/uncannycatgolfranks.png);
+    background-size: 5824px;
+    --xPosEnd: -5824px;
+    --yPosDiff: -352;
+    &.play {
+        animation:
+            walk-x 0.65s steps(13) infinite,
+            walk-y 3.25s steps(1, end) infinite;
+    }
 }
 
 #Tiles g {
@@ -591,22 +599,22 @@ h1, h2, h3 {
 
 @keyframes walk-y {
     0% {background-position-y: 0;}
-    20% {background-position-y: -820px;}
-    40% {background-position-y: -1640px;}
-    60% {background-position-y: -2460px;}
-    80% {background-position-y: -3280px;}
-    100% {background-position-y: -4280px;}
-}
-
-.sprite {
-    animation: 
-        walk-x 0.8s steps(12) infinite,
-        walk-y 4s steps(1, end) infinite;
-    visibility: visible !important;
-    --xPosEnd: -9840px;
+    20% {background-position-y: calc(var(--yPosDiff)*1px);}
+    40% {background-position-y: calc(var(--yPosDiff)*2px);}
+    60% {background-position-y: calc(var(--yPosDiff)*3px);}
+    80% {background-position-y: calc(var(--yPosDiff)*4px);}
+    100% {background-position-y: calc(var(--yPosDiff)*5px);}
 }
 
 #WinConfetti {
     background-image: url(assets/graphics/winconfetti.png);
     background-size: 9840px;
+    --xPosEnd: -9840px;
+    --yPosDiff: -820;
+    &.sprite {
+        animation: 
+            walk-x 0.8s steps(12) infinite,
+            walk-y 4s steps(1, end) infinite;
+        visibility: visible;
+    }
 }
