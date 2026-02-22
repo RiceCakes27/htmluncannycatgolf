@@ -369,7 +369,7 @@ stageresults.addEventListener('click', () => {
 
         stageresults.style = null;
         stageresults.classList = '';
-        stageresults.querySelectorAll('h1, #RankTextR, #RankHolder').forEach((text) => {
+        stageresults.querySelectorAll('h1, #RankTextR, #Rank').forEach((text) => {
             text.style = null;
         });
 
