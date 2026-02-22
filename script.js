@@ -611,33 +611,8 @@ function update() {
                         //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
 
                         const rank = rankings[rank_number];
-                        if (rank.frames) {
-                            function rankanim() {
-                                rankImg.style.backgroundPositionY = (rank.y) * -352 +'px' || 0;
-                                rankImg.style.setProperty('--xPosStart', rank.x * -448 +'px' || 0);
-                                rankImg.style.setProperty('--steps', 13-rank.x);
-                                rankImg.style.setProperty('--time', 0.05*(13-rank.x)+'s');
-                                rankImg.classList.add('play');
-                                if (13-rank.x !== rank.frames) {
-                                    setTimeout(() => {
-                                        rankImg.classList.remove('play');
-                                        rankImg.style.backgroundPositionY = (rank.y+1) * -352 +'px' || 0;
-                                        rankImg.style.setProperty('--xPosStart', '0px');
-                                        rankImg.style.setProperty('--steps', rank.frames - (13-rank.x));
-                                        rankImg.style.setProperty('--time', 0.05*(rank.frames - (13-rank.x))+'s');
-                                        rankImg.classList.add('play');
-                                        if (rank.loop !== true) {
-                                            rankanim();
-                                            console.log('ss')
-                                        }
-                                    }, 0.05*(13-rank.x)+'s');
-                                }
-                            }
-                            rankanim();
-                        } else {
-                            rankImg.style.backgroundPositionX = rank.x * -448 +'px' || 0;
-                            rankImg.style.backgroundPositionY = rank.y * -352 +'px' || 0;
-                        }
+                        //welp i need to try something else
+
                         playSound(rankings[rank_number].sfx);
                     }
                 }

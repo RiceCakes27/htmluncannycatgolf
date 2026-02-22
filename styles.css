@@ -438,13 +438,6 @@ h1, h2, h3 {
     scale: 0.8;
     background-image: url(assets/graphics/uncannycatgolfranks.png);
     background-size: 5824px;
-    --xPosEnd: -5824px;
-    --yPosDiff: -352;
-    &.play {
-        animation:
-            walk-x var(--time, 0.65s) steps(var(--steps, 13)),
-            walk-y 3.25s steps(1, end) var(--delay);
-    }
 }
 
 #Tiles g {
