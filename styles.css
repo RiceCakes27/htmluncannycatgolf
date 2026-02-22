@@ -442,8 +442,8 @@ h1, h2, h3 {
     --yPosDiff: -352;
     &.play {
         animation:
-            walk-x var(--time, 0.65s) steps(var(--steps, 13)) infinite,
-            walk-y 3.25s steps(1, end) infinite;
+            walk-x var(--time, 0.65s) steps(var(--steps, 13)),
+            walk-y 3.25s steps(1, end) var(--delay);
     }
 }
 
