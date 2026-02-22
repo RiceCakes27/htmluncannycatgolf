@@ -751,7 +751,7 @@ function startLevel() {
                     stagenamelabel.textContent = '0-1: Welcome to Uncanny Cat Golf!';
                     levelbackground.style = null;
                     walls = false;
-                    document.querySelector('#Tiles .active').classList.remove('active');
+                    document.querySelectorAll('#Tiles .active').forEach(e => e.classList.remove('active'));
                 break;
                 case 2:
                     peak_value = 10000;
