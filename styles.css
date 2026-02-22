@@ -218,8 +218,8 @@ h1, h2, h3 {
     width: 150px;
     background-image: url(assets/graphics/goalflag.png);
     background-size: 600px;
-    --xPosEnd: -450px;
-    animation: walk-x 0.3s steps(3) infinite;
+    --xPosEnd: -600px;
+    animation: walk-x 0.33s steps(4) infinite;
 }
 
 #Hole {
@@ -578,9 +578,9 @@ h1, h2, h3 {
 #PauseAnim {
     width: 820px;
     height: 820px;
-    animation: walk-x 0.8s steps(3) infinite;
+    animation: walk-x 0.8s steps(4) infinite;
     background-image: url(assets/graphics/pausegraphic.png);
-    --xPosEnd: -2460px;
+    --xPosEnd: -3280px;
     background-size: 3280px;
 }
 
@@ -591,18 +591,19 @@ h1, h2, h3 {
 
 @keyframes walk-y {
     0% {background-position-y: 0;}
-    25% {background-position-y: -820px;}
-    50% {background-position-y: -1640px;}
-    75% {background-position-y: -2460px;}
-    100% {background-position-y: -3280px;}
+    20% {background-position-y: -820px;}
+    40% {background-position-y: -1640px;}
+    60% {background-position-y: -2460px;}
+    80% {background-position-y: -3280px;}
+    100% {background-position-y: -4280px;}
 }
 
 .sprite {
     animation: 
-        walk-x 0.8s steps(11) infinite,
-        walk-y 3.2s steps(1, end) infinite;
+        walk-x 0.8s steps(12) infinite,
+        walk-y 4s steps(1, end) infinite;
     visibility: visible !important;
-    --xPosEnd: -9020px;
+    --xPosEnd: -9840px;
 }
 
 #WinConfetti {
