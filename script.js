@@ -22,6 +22,7 @@ const pausemenu = document.getElementById('PauseMenu');
 const levelselectdisplay = document.getElementById('ChoiceDisplay');
 const ending = document.getElementById('Ending');
 const endingbg = document.getElementById('Endingbg');
+const confetti = document.getElementById('WinConfetti')
 const delay = ms => new Promise(res => setTimeout(res, ms));
 const splash = [
 	"honestly quite incredible",
@@ -359,6 +360,8 @@ stageresults.addEventListener('click', () => {
         stageresults.querySelectorAll('h1, #RankTextR, #RankHolder').forEach((text) => {
             text.style = null;
         });
+
+        confetti.classList.remove('sprite');
     }
 });
 
@@ -554,6 +557,8 @@ function update() {
             addToQueue('Win');
 
             ableToStroke = false;
+
+            confetti.classList.add('sprite');
 
             let golfhitbonus;
             if (golfhit <= 1) {

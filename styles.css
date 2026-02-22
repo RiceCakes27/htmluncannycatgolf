@@ -308,7 +308,7 @@ h1, h2, h3 {
     animation: down 1.5s;
 }
 
-#StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds, #Ending {
+#StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds, #Ending, #WinConfetti {
     visibility: hidden;
 }
 #StageResults, #UncannyDeath, #LevelSelect, #OntoWorlds div {
@@ -584,4 +584,30 @@ h1, h2, h3 {
 #PauseAnimHolder img {
     height: 820px;
     width: 3280px;
+}
+
+@keyframes walk-x {
+    from {background-position-x: 0;}
+    to {background-position-x: -9020px;}
+}
+
+@keyframes walk-y {
+    0% {background-position-y: 0;}
+    25% {background-position-y: -820px;}
+    50% {background-position-y: -1640px;}
+    75% {background-position-y: -2460px;}
+    100% {background-position-y: -3280px;}
+}
+
+.sprite {
+    animation: 
+        walk-x 0.8s steps(11) infinite,
+        walk-y 3.2s steps(1, end) infinite;
+    visibility: visible !important;
+}
+
+#WinConfetti {
+    background-image: url(assets/graphics/winconfetti.png);
+    background-repeat: no-repeat;
+    background-size: 9840px;
 }
