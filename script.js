@@ -37,7 +37,7 @@ const rankings = [{
         rank: "RankPeak",
         sfx: "PeakWin",
         frames: 3,
-        fps: 30,
+        ms: 97,
         x: 12,
         y: 2
     },{
@@ -61,7 +61,7 @@ const rankings = [{
         sfx: "EpicFail",
         frames: 15,
         loop: false,
-        hold: 7.5,
+        hold: 750,
         x: 1
     },{
         rank: "RankUncanny",
@@ -74,7 +74,7 @@ const rankings = [{
         sfx: "XylophoneCancel"
 }];
 
-let clickpoint, barlength, strokingIt, frameController, levelTimer, totalTimer;
+let clickpoint, barlength, strokingIt, frameController, levelTimer, totalTimer, rankInterval;
 let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0, score = 0, finalbonus = 0;
 let level = 1;
 let notMoving = true;
@@ -375,6 +375,8 @@ stageresults.addEventListener('click', () => {
         });
 
         confetti.classList.remove('sprite');
+
+        clearInterval(rankInterval);
     }
 });
 
@@ -603,18 +605,40 @@ function update() {
             }
             setTimeout(() => {
                 if (prevlevel == level) {
+                    const rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
+                    const rank = finalbonus <= 0 ? rankings.find(r => r.rank === "RankUncanny") : rankings[rank_number];
+
+                    const rankWidth = '448', rankHeight = '352';
+
                     rankImg.style.visibility = 'visible';
-                    if (finalbonus <= 0) {
-                        //$StageResults/Rank/AnimationPlayer.play("RankUncanny")
-                    } else {
-                        const rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
-                        //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
 
-                        const rank = rankings[rank_number];
-                        //welp i need to try something else
+                    rankImg.style.backgroundPositionX = rank.x * -rankWidth +'px' || 0;
+                    rankImg.style.backgroundPositionY = rank.y * -rankHeight +'px' || 0;
 
-                        playSound(rankings[rank_number].sfx);
+                    let currentFrame = 1;
+                    function nextFrame() {
+                        if (currentFrame == rank.frames && rank.loop == false) {
+                            clearInterval(rankInterval);
+                            return;
+                        }
+                        if (rankImg.style.backgroundPositionX.split('px')[0]-rankWidth > -rankWidth*13) {
+                            rankImg.style.backgroundPositionX = rankImg.style.backgroundPositionX.split('px')[0]-rankWidth+'px';
+                        } else {
+                            rankImg.style.backgroundPositionY = rankImg.style.backgroundPositionY.split('px')[0]-rankHeight+'px';
+                            rankImg.style.backgroundPositionX = 0;
+                        }
+                        if (currentFrame == rank.frames) {
+                            currentFrame = 0;
+                            rankImg.style.backgroundPositionX = rank.x * -rankWidth +'px';
+                            rankImg.style.backgroundPositionY = rank.y * -rankHeight +'px';
+                        }
+                        currentFrame++;
                     }
+                    setTimeout(() => {
+                        if (rank.frames) rankInterval = setInterval(nextFrame, rank.ms || 50);
+                    }, rank.hold ? rank.hold : 0);
+
+                    playSound(rankings[rank_number].sfx);
                 }
             }, 1600 + results.length*300);
 
