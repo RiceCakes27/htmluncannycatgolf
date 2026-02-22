@@ -443,6 +443,9 @@ h1, h2, h3 {
 #Tiles g {
     visibility: hidden;
 }
+#Tiles .active {
+    visibility: visible;
+}
 
 #OntoWorlds {
     overflow: hidden;

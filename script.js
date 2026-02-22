@@ -255,10 +255,9 @@ document.addEventListener('pointerup', (click) => {
 
 function svg2walls(svg) {
     let path = svg.querySelector('path').getAttribute('d').split(' ');
-    let dindex = 0;
+    let dindex = 0, linebegin = 0;
     let current = {x: 0, y: 0};
     let walls = [];
-    let linebegin;
     function handleCommand() {
         let cords;
         switch (path[dindex]) {
@@ -283,18 +282,15 @@ function svg2walls(svg) {
                 current.x = walls[walls.length-1].to[0];
             return true;
             case 'Z':
-                walls.push({from: [current.x, current.y], to: [walls[0].from[0], walls[0].from[1]]});
-                current = {x: walls[0].from[0], y: walls[0].from[1]};
+            case 'z':
+                walls.push({from: [current.x, current.y], to: [walls[linebegin].from[0], walls[linebegin].from[1]]});
+                current = {x: walls[linebegin].from[0], y: walls[linebegin].from[1]};
                 linebegin = walls.length;
                 dindex -= 1;
             return true;
             case 'm':
                 cords = path[dindex+1].split(',');
                 current = {x: current.x+ +cords[0], y: current.y+ +cords[1]};
-            return true;
-            case 'z':
-                walls.push({from: [current.x, current.y], to: [walls[linebegin].from[0], walls[linebegin].from[1]]});
-                dindex -= 1;
             return true;
             default:
                 return false;
@@ -448,6 +444,56 @@ function isIntersecting(rect1, rect2) {
              rect2.bottom < rect1.top);
 }
 
+function resolveWallCollision(entity, wall, offsetX = 0, offsetY = 0) {
+  const [fx, fy] = wall.from;
+  const [tx, ty] = wall.to;
+  const isHorizontal = fy === ty;
+
+  const wallMinX = Math.min(fx, tx) + offsetX;
+  const wallMaxX = Math.max(fx, tx) + offsetX;
+  const wallMinY = Math.min(fy, ty) + offsetY;
+  const wallMaxY = Math.max(fy, ty) + offsetY;
+
+  // Previous position (before this frame's movement)
+  const prevRect = {
+    x: entity.left - speed.x,
+    y: entity.top - speed.y,
+    w: entity.width,
+    h: entity.height
+  };
+  const currRect = { x: entity.left, y: entity.top, w: entity.width, h: entity.height };
+
+  if (isHorizontal) {
+    const wallY = fy  + offsetY;
+
+    // Entity must overlap the wall's X span
+    const overlapX = currRect.x < wallMaxX && currRect.x + currRect.w > wallMinX;
+    if (!overlapX) return;
+
+    // Was entity above the wall last frame? (bottom edge above wallY)
+    const wasAbove = prevRect.y + prevRect.h <= wallY;
+    // Was entity below the wall last frame? (top edge below wallY)
+    const wasBelow = prevRect.y >= wallY;
+
+    // Coming from above
+    if (wasAbove && currRect.y + currRect.h > wallY || wasBelow && currRect.y < wallY) return 'y';
+
+  } else {
+    const wallX = fx  + offsetX;
+
+    // Entity must overlap the wall's Y span
+    const overlapY = currRect.y < wallMaxY && currRect.y + currRect.h > wallMinY;
+    if (!overlapY) return;
+
+    const wasLeft  = prevRect.x + prevRect.w <= wallX;
+    const wasRight = prevRect.x >= wallX;
+
+    // Coming from left
+    if (wasLeft && currRect.x + currRect.w > wallX || wasRight && currRect.x < wallX) return 'x';
+
+  }
+}
+
 function applyForce(forceX, forceY) {
     speed.x += forceX;
     speed.y += forceY;
@@ -474,16 +520,15 @@ function update() {
     // Check for wall collisions
     if (walls) {
         walls.forEach(wall => {
-            if (wall.from[0] == wall.to[0]) {
-                //vertical
-                //console.log(playerRect, {left: Math.min(wall.from[0], wall.to[0]), right: Math.max(wall.from[0], wall.to[0]), top: Math.min(wall.from[1], wall.to[1]), bottom: Math.max(wall.from[1], wall.to[1])})
-                if (isIntersecting(playerRect, {left: Math.min(wall.from[0], wall.to[0]), right: Math.max(wall.from[0], wall.to[0]), top: Math.min(wall.from[1], wall.to[1]), bottom: Math.max(wall.from[1], wall.to[1])})) {
+            switch (resolveWallCollision(playerRect, wall, 410)) {
+                case 'x':
                     speed.x *= -1; // Reverse x direction on collision
-                    player.style.left = Math.max(wall.from[1]-leftOffset, Math.min(playerLeft-leftOffset + speed.x, wall.to[1] - playerWidth)) + 'px'; // Clamp position
+                    player.style.left = Math.max(containerLeft-leftOffset, Math.min(playerLeft-leftOffset + speed.x, containerRight - playerWidth)) + 'px'; // Clamp position
                     playSound('WallBump2');
-                }
-            } else if (wall.from[1] == wall.to[1]) {
-                //horizontal
+                case 'y':
+                    speed.y *= -1; // Reverse y direction on collision
+                    player.style.top = Math.max(containerTop, Math.min(playerTop + speed.y, containerBottom - playerHeight)) + 'px'; // Clamp position
+                    playSound('WallBump2');
             }
         });
     } else {
@@ -705,6 +750,7 @@ function startLevel() {
                     stagenamelabel.textContent = '0-1: Welcome to Uncanny Cat Golf!';
                     levelbackground.style = null;
                     walls = false;
+                    document.querySelector('#Tiles .active').classList.remove('active');
                 break;
                 case 2:
                     peak_value = 10000;
@@ -714,12 +760,10 @@ function startLevel() {
                     goal.style.left = '665px';
                     stagenamelabel.textContent = '0-2: Hello, Walls';
                     levelbackground.style.left = '-820px';
-                    
-                    //testing below
-                    //const tiles = document.getElementById('w0l2');
-                    //tiles.style.visibility = 'visible';
-                    //walls = svg2walls(tiles);
-                    //make gooder
+
+                    const tiles = document.getElementById('w0l2');
+                    tiles.classList.add('active');
+                    walls = svg2walls(tiles);
                 break;
                 default:
                     ontoNextWorld();
