@@ -523,6 +523,7 @@ function update() {
             switch (resolveWallCollision(playerRect, wall, 410)) {
                 case 'x':
                     speed.x *= -1; // Reverse x direction on collision
+                    speed.y *= -1;
                     player.style.left = Math.max(containerLeft-leftOffset, Math.min(playerLeft-leftOffset + speed.x, containerRight - playerWidth)) + 'px'; // Clamp position
                     playSound('WallBump2');
                 case 'y':
