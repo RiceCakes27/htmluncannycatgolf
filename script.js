@@ -23,7 +23,7 @@ const levelselectdisplay = document.getElementById('ChoiceDisplay');
 const ending = document.getElementById('Ending');
 const endingbg = document.getElementById('Endingbg');
 const confetti = document.getElementById('WinConfetti');
-const rank = document.getElementById('Rank');
+const rankImg = document.getElementById('Rank');
 const delay = ms => new Promise(res => setTimeout(res, ms));
 const splash = [
 	"honestly quite incredible",
@@ -35,21 +35,39 @@ const splash = [
 ];
 const rankings = [{
         rank: "RankPeak",
-        sfx: "PeakWin"
+        sfx: "PeakWin",
+        frames: 3,
+        x: 12,
+        y: 2
     },{
         rank: "RankSwag",
-        sfx: "Swag"
+        sfx: "Swag",
+        x: 11,
+        y: 2
     },{
         rank: "RankOK",
-        sfx: "Okay"
+        sfx: "Okay",
+        frames: 20,
+        x: 4,
+        y: 1
     },{
         rank: "RankBelowAverage",
-        sfx: "UhOhWavySynth"
+        sfx: "UhOhWavySynth",
+        x: 3,
+        y: 1
     },{
         rank: "RankAwful",
-        sfx: "EpicFail"
+        sfx: "EpicFail",
+        frames: 15,
+        loop: false,
+        hold: 7.5,
+        x: 1
     },{
         rank: "RankUncanny",
+        frames: 24,
+        loop: false,
+        x: 2,
+        y: 3
     },{
         rank: "NoRank",
         sfx: "XylophoneCancel"
@@ -584,13 +602,18 @@ function update() {
             }
             setTimeout(() => {
                 if (prevlevel == level) {
-                    rank.style.visibility = 'visible';
+                    rankImg.style.visibility = 'visible';
                     if (finalbonus <= 0) {
                         //$StageResults/Rank/AnimationPlayer.play("RankUncanny")
                     } else {
                         const rank_number = Math.min(4, Math.max(0, 8 - Math.floor(8.0 * finalbonus / peak_value)));
                         //$StageResults/Rank/AnimationPlayer.play(rankings[rank_number])
-                        rank.classList.add('play');
+
+                        const rank = rankings[rank_number];
+                        rankImg.style.backgroundPositionX = rank.x * -448 +'px' || 0;
+                        rankImg.style.backgroundPositionY = rank.y * -352 +'px' || 0;
+                        //rank.classList.add('play');
+
                         playSound(rankings[rank_number].sfx);
                     }
                 }
