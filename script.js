@@ -76,7 +76,7 @@ const rankings = [{
 
 let clickpoint, barlength, strokingIt, frameController, levelTimer, totalTimer, rankInterval;
 let golfhit = 0, levelMins = 0, levelSecs = 0, world = 0, resets = 0, score = 0, finalbonus = 0;
-let level = 1;
+let level = 1, windowScale = 1;
 let notMoving = true;
 let globalTime = false, ableToStroke = false, paused = false, walls = false;
 let thoughtsQueue = "";
@@ -230,13 +230,14 @@ function mousemove(cursor) {
 
 gamewindow.addEventListener('pointerdown', (click) => {
     if (notMoving && ableToStroke) {
+        const containerRect = document.getElementById('container').getBoundingClientRect();
         clickpoint = click;
         strokingIt = true;
 
         playSound('WhistleGrab');
 
-        clickmarker.style.left = click.x+'px';
-        clickmarker.style.top = click.y+'px';
+        clickmarker.style.left = (click.x - containerRect.left) / windowScale +'px';
+        clickmarker.style.top = (click.y - containerRect.top) / windowScale +'px';
         clickmarker.style.visibility = 'visible';
 
         barlength = 0;
@@ -440,6 +441,15 @@ document.getElementById('MenuButton').addEventListener('click', () => {
     requestAnimationFrame(update);
 });
 
+function resize() {
+    const scaleX = window.innerWidth / 1230;
+    const scaleY = window.innerHeight / 820;
+    windowScale = Math.min(scaleX, scaleY); // contain behavior
+    document.getElementById('container').style.setProperty('--scale', windowScale);
+}
+window.addEventListener('resize', resize);
+resize();
+
 //physics
 const speed = { x: 0, y: 0 }; // Initial speed in x and y directions
 const friction = 0.995; // Friction factor for slowing down
@@ -512,34 +522,35 @@ function applyForce(forceX, forceY) {
 
 function update() {
     const goalRect = goal.querySelector('#Hole').getBoundingClientRect();
-    const leftOffset = gamewindow.offsetLeft;
+
+    const containerRect = gamewindow.getBoundingClientRect();
+    const containerLeft = 0;
+    const containerRight = containerRect.width / windowScale;
+    const containerTop = 0;
+    const containerBottom = containerRect.bottom;
+    const containerOffsetLeft = gamewindow.offsetLeft;
+    //const containerOffsetTop = gamewindow.offsetTop;
 
     const playerRect = player.getBoundingClientRect();
-    const playerLeft = playerRect.left;
-    const playerRight = playerRect.right;
-    const playerTop = playerRect.top;
+    const playerLeft = (playerRect.left - containerRect.left) / windowScale;
+    const playerRight = playerLeft + playerRect.width;
+    const playerTop = (playerRect.top - containerRect.top) / windowScale;
     const playerBottom = playerRect.bottom;
     const playerWidth = playerRect.width;
     const playerHeight = playerRect.height;
 
-    const containerRect = gamewindow.getBoundingClientRect();
-    const containerLeft = containerRect.left;
-    const containerRight = containerRect.right;
-    const containerTop = containerRect.top;
-    const containerBottom = containerRect.bottom;
-
     // Check for wall collisions
     if (walls) {
         walls.forEach(wall => {
-            switch (resolveWallCollision(playerRect, wall, 410)) {
+            switch (resolveWallCollision(playerRect, wall, containerRect.left, containerRect.top)) {
                 case 'x':
                     speed.x *= -1; // Reverse x direction on collision
-                    player.style.left = Math.max(containerLeft-leftOffset, Math.min(playerLeft-leftOffset + speed.x, containerRight - playerWidth)) + 'px'; // Clamp position
+                    //player.style.left = Math.max(containerLeft-containerOffsetLeft, Math.min(playerLeft-containerOffsetLeft + speed.x, containerRight - playerWidth)) + 'px'; // Clamp position
                     playSound('WallBump2');
                 break;
                 case 'y':
                     speed.y *= -1; // Reverse y direction on collision
-                    player.style.top = Math.max(containerTop, Math.min(playerTop + speed.y, containerBottom - playerHeight)) + 'px'; // Clamp position
+                    //player.style.top = Math.max(containerTop, Math.min(playerTop + speed.y, containerBottom - playerHeight)) + 'px'; // Clamp position
                     playSound('WallBump2');
                 break;
             }
@@ -547,12 +558,12 @@ function update() {
     } else {
         if (playerLeft <= containerLeft || playerRight >= containerRight) {
             speed.x *= -1; // Reverse x direction on collision
-            player.style.left = Math.max(containerLeft-leftOffset, Math.min(playerLeft-leftOffset + speed.x, containerRight - playerWidth)) + 'px'; // Clamp position
+            //player.style.left = Math.max(containerLeft-containerOffsetLeft, Math.min(playerLeft-containerOffsetLeft + speed.x, containerRight - playerWidth)) + 'px'; // Clamp position
             playSound('WallBump2');
         }
         if (playerTop <= containerTop || playerBottom >= containerBottom) {
             speed.y *= -1; // Reverse y direction on collision
-            player.style.top = Math.max(containerTop, Math.min(playerTop + speed.y, containerBottom - playerHeight)) + 'px'; // Clamp position
+            //player.style.top = Math.max(containerTop, Math.min(playerTop + speed.y, containerBottom - playerHeight)) + 'px'; // Clamp position
             playSound('WallBump2');
         }
     }
@@ -673,8 +684,8 @@ function update() {
 
 
     // Movement
-    player.style.left = playerLeft-leftOffset + speed.x + window.pageXOffset + 'px';
-    player.style.top = playerTop + speed.y + window.pageYOffset + 'px';
+    player.style.left = playerLeft + speed.x + 'px';
+    player.style.top = playerTop + speed.y + 'px';
 
     const speedMagnitude = Math.sqrt(speed.x ** 2 + speed.y ** 2);
     
