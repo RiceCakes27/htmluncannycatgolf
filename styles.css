@@ -603,6 +603,19 @@ h1, h2, h3 {
     100% {background-position-y: calc(var(--yPosDiff)*5px);}
 }
 
+#WinConfetti {
+    background-image: url(assets/graphics/winconfetti.png);
+    background-size: 9840px;
+    --xPosEnd: -9840px;
+    --yPosDiff: -820;
+    &.sprite {
+        animation: 
+            walk-x 0.8s steps(12) infinite,
+            walk-y 4s steps(1, end) infinite;
+        visibility: visible;
+    }
+}
+
 #container {
     width: 1230px;
     height: 820px;
